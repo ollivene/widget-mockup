@@ -1,0 +1,2609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Online Booking — Ambivet Heanor</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --primary:        #1e40af;
+      --primary-hover:  #1d3a9e;
+      --primary-light:  #eff4ff;
+      --primary-border: #bfcfff;
+      --text-strong:    #0f172a;
+      --text-base:      #334155;
+      --text-weak:      #64748b;
+      --text-weaker:    #94a3b8;
+      --border:         #e2e8f0;
+      --surface:        #ffffff;
+      --surface-raised: #f8fafc;
+      --radius-s:       6px;
+      --radius-m:       10px;
+      --radius-l:       14px;
+      --shadow-widget:  0 4px 24px rgba(15,23,42,0.10), 0 1px 4px rgba(15,23,42,0.06);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 48px 16px 64px;
+    }
+
+    /* ── Page chrome ── */
+    .page-header {
+      width: 100%;
+      max-width: 540px;
+      margin-bottom: 28px;
+      text-align: center;
+    }
+
+    .page-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-strong);
+      letter-spacing: -0.02em;
+    }
+
+    .page-header p {
+      font-size: 14px;
+      color: var(--text-weak);
+      margin-top: 4px;
+    }
+
+    /* ── Widget shell ── */
+    .widget {
+      width: 100%;
+      max-width: 540px;
+      height: 670px;
+      background: var(--surface);
+      border-radius: var(--radius-l);
+      box-shadow: var(--shadow-widget);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    @media (max-width: 639px) {
+      .widget {
+        height: 100dvh;
+        max-width: 100%;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+      }
+    }
+
+    /* ── Header ── */
+    .widget-header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 16px 0;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 12px;
+    }
+
+    .header-icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface-raised);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-base);
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+
+    .header-icon-btn:hover { background: var(--border); }
+    .header-icon-btn svg { width: 16px; height: 16px; display: block; }
+
+    .header-text { flex: 1; min-width: 0; }
+
+    .header-clinic {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-strong);
+      line-height: 1.2;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .header-sub {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 3px;
+    }
+
+    .header-step-label {
+      font-size: 12px;
+      color: var(--text-weak);
+    }
+
+    .header-dot {
+      width: 3px;
+      height: 3px;
+      border-radius: 50%;
+      background: var(--text-weaker);
+      flex-shrink: 0;
+    }
+
+    .header-show-details {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--primary);
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .header-show-details svg {
+      width: 11px;
+      height: 11px;
+      transition: transform 0.2s;
+    }
+
+    .header-show-details.open svg { transform: rotate(180deg); }
+
+    /* ── Segmented progress bar ── */
+    .progress-segments {
+      display: flex;
+      gap: 4px;
+    }
+
+    .progress-seg {
+      flex: 1;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--border);
+      transition: background 0.3s ease;
+    }
+
+    .progress-seg.filled { background: var(--primary); }
+
+    /* ── Focus accessibility ── */
+    *:focus-visible {
+      outline: 2px solid var(--primary);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+
+    /* ── Body ── */
+    .widget-body {
+      padding: 28px 24px 16px;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .widget-body::-webkit-scrollbar { width: 3px; }
+    .widget-body::-webkit-scrollbar-track { background: transparent; }
+    .widget-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+
+    /* ── Step emoji circle ── */
+    .step-emoji {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--surface-raised);
+      font-size: 20px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+
+    /* ── Start screen ── */
+    .start-question {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-strong);
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      margin-bottom: 24px;
+    }
+
+    .start-sub {
+      font-size: 13px;
+      color: var(--text-weak);
+      line-height: 1.5;
+    }
+
+    .start-actions { display: flex; flex-direction: column; gap: 10px; }
+
+    /* Shared action button base */
+    .action-primary,
+    .action-secondary {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      padding: 16px 18px;
+      border-radius: var(--radius-m);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+      min-height: 64px;
+    }
+
+    /* Primary action */
+    .action-primary {
+      border: 1.5px solid var(--primary-border);
+      background: var(--primary-light);
+      box-shadow: 0 1px 3px rgba(15,23,42,0.07);
+    }
+
+    .action-primary:hover {
+      background: #e4edff;
+      box-shadow: 0 2px 8px rgba(15,23,42,0.10);
+    }
+
+    .action-book-btn {
+      flex-shrink: 0;
+      padding: 7px 14px;
+      border-radius: var(--radius-s);
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .action-book-btn:hover { background: var(--primary-hover); }
+
+    .action-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-s);
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .action-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--primary);
+    }
+
+    .action-primary-body { flex: 1; }
+
+    .action-primary-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-strong);
+      line-height: 1.2;
+    }
+
+    .action-primary-meta {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .action-primary-desc {
+      font-size: 12px;
+      color: var(--text-weak);
+    }
+
+    .avail-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 11px;
+      font-weight: 500;
+      color: #16a34a;
+    }
+
+    .avail-tag-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #22c55e;
+      flex-shrink: 0;
+    }
+
+    .action-icon--secondary {
+      background: var(--surface-raised);
+    }
+
+    .action-icon--secondary svg {
+      fill: var(--text-weak);
+    }
+
+    /* Secondary action — light outline */
+    .action-secondary {
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+    }
+
+    .action-secondary:hover { background: var(--surface-raised); }
+
+    .action-secondary-body { flex: 1; }
+
+    .action-secondary-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-base);
+      line-height: 1.2;
+    }
+
+    .action-secondary-desc {
+      font-size: 12px;
+      color: var(--text-weaker);
+      margin-top: 3px;
+    }
+
+    .action-chevron {
+      color: var(--text-weaker);
+      flex-shrink: 0;
+    }
+
+    .action-chevron svg { width: 16px; height: 16px; display: block; }
+
+    /* ── Summary panel ── */
+
+    .summary-content {
+      display: none;
+      padding: 16px 24px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+    }
+
+    .summary-content.open { display: block; }
+
+    .summary-rows {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .summary-row {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .summary-lbl {
+      font-size: 12px;
+      color: var(--text-weak);
+    }
+
+    .summary-val {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-strong);
+      line-height: 1.3;
+    }
+
+    /* ── Step question ── */
+    .step-question {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-strong);
+      line-height: 1.35;
+      margin-bottom: 20px;
+    }
+
+    .step-hint {
+      font-size: 13px;
+      color: var(--text-weak);
+      margin-bottom: 24px;
+    }
+
+    /* ── Species grid ── */
+    .species-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .species-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 24px 12px;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-base);
+      font-family: inherit;
+    }
+
+    .species-btn:hover {
+      border-color: var(--primary-border);
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .species-btn.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    .species-btn svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      opacity: 0.75;
+      flex-shrink: 0;
+    }
+
+    /* Compact species grid inside a form field */
+    .pet-species-grid { gap: 8px; }
+    .pet-species-grid .species-btn { padding: 8px 6px; font-size: 12px; gap: 4px; }
+    .pet-species-grid .species-btn svg { width: 18px; height: 18px; }
+    .pet-species-grid .show-more-btn { padding: 8px 10px; font-size: 12px; }
+
+    /* Text-only species btn (show more items) */
+    .species-btn.text-only {
+      flex-direction: row;
+      gap: 0;
+      padding: 14px 12px;
+    }
+
+    .show-more-btn {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 11px;
+      border-radius: var(--radius-m);
+      border: 1.5px dashed var(--border);
+      background: transparent;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-weak);
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s;
+    }
+
+    .show-more-btn:hover { border-color: var(--primary); color: var(--primary); }
+    .show-more-btn svg { width: 14px; height: 14px; }
+
+    /* ── Treatment categories ── */
+    .treatment-scroll {
+      padding-right: 2px;
+    }
+
+    .treatment-scroll::-webkit-scrollbar { width: 3px; }
+    .treatment-scroll::-webkit-scrollbar-track { background: transparent; }
+    .treatment-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .category-block {
+      margin-bottom: 6px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-m);
+      overflow: hidden;
+    }
+
+    .category-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      cursor: pointer;
+      background: var(--surface);
+      user-select: none;
+    }
+
+    .category-name {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-strong);
+    }
+
+    .category-chevron {
+      color: var(--text-weaker);
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+
+    .category-chevron svg { width: 15px; height: 15px; display: block; }
+    .category-header.open .category-chevron { transform: rotate(180deg); }
+
+    .category-items {
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0 10px 10px;
+    }
+
+    .category-items.open { display: flex; }
+
+    .reason-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-m);
+      background: var(--surface);
+      cursor: pointer;
+      font-family: inherit;
+      text-align: left;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .reason-btn:hover { background: var(--surface-raised); }
+    .reason-btn.selected { border-color: var(--primary); background: var(--primary-light); }
+
+    .reason-btn-body {
+      flex: 1;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+
+    .reason-btn-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-strong);
+    }
+
+    .reason-btn-duration {
+      font-size: 12px;
+      color: var(--text-weaker);
+      white-space: nowrap;
+    }
+
+    .reason-chevron { color: var(--text-weaker); flex-shrink: 0; }
+    .reason-chevron svg { width: 13px; height: 13px; display: block; }
+
+    /* ── Date + time picker ── */
+    .date-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+
+    .date-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-strong);
+    }
+
+    .week-nav-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .week-nav-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: var(--radius-s);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-base);
+      transition: border-color 0.12s, color 0.12s;
+      flex-shrink: 0;
+    }
+
+    .week-nav-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+    .week-nav-btn:disabled { opacity: 0.3; cursor: default; }
+    .week-nav-btn svg { width: 15px; height: 15px; display: block; }
+
+    .week-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .day-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 12px 6px 10px;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .day-card:hover:not(:disabled) {
+      border-color: var(--primary-border);
+      background: var(--primary-light);
+    }
+
+    .day-card.selected {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .day-card.today:not(.selected) { border-color: var(--primary); }
+
+    .day-card:disabled { opacity: 0.35; cursor: default; }
+
+    .day-card-name {
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text-weak);
+    }
+
+    .day-card.selected .day-card-name { color: rgba(255,255,255,0.75); }
+
+    .day-card-date {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-strong);
+      line-height: 1;
+    }
+
+    .day-card.selected .day-card-date { color: #fff; }
+
+    .day-card:disabled .day-card-name,
+    .day-card:disabled .day-card-date { color: var(--text-weaker); }
+
+    .avail-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--primary);
+      margin-top: 2px;
+    }
+
+    .day-card.selected .avail-dot { background: rgba(255,255,255,0.6); }
+    .day-card:disabled .avail-dot  { display: none; }
+
+    .times-heading {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-strong);
+      margin-bottom: 12px;
+      margin-top: 4px;
+    }
+
+    .times-empty {
+      font-size: 13px;
+      color: var(--text-weak);
+      padding: 8px 0;
+    }
+
+    .times-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+
+    .time-btn {
+      padding: 18px 8px;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-strong);
+      font-family: inherit;
+      text-align: center;
+      transition: border-color 0.12s, background 0.12s, color 0.12s;
+    }
+
+    .time-btn:hover {
+      border-color: var(--primary-border);
+      background: var(--primary-light);
+    }
+
+    .time-btn.selected {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    /* ── Email + OTP screens ── */
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-strong);
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .field-required { color: #dc2626; font-size: 12px; }
+
+    .field-input {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text-strong);
+      background: var(--surface);
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+    }
+
+    .field-input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30,64,175,0.1);
+    }
+
+    .field-input.error {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+    }
+
+    .field-error {
+      font-size: 12px;
+      color: #dc2626;
+      margin-top: 5px;
+      min-height: 16px;
+    }
+
+    .email-hint {
+      font-size: 13px;
+      color: var(--text-weak);
+      line-height: 1.55;
+      margin-bottom: 20px;
+    }
+
+    .sent-notice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 12px 14px;
+      border-radius: var(--radius-m);
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #166534;
+      line-height: 1.45;
+    }
+
+    .sent-notice svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
+
+    .otp-grid {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .otp-box {
+      flex: 1;
+      height: 46px;
+      min-width: 0;
+      text-align: center;
+      font-size: 18px;
+      font-weight: 700;
+      font-family: inherit;
+      color: var(--text-strong);
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      outline: none;
+      caret-color: var(--primary);
+      transition: border-color 0.15s, box-shadow 0.15s;
+      -webkit-appearance: none;
+      padding: 0;
+    }
+
+    .otp-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30,64,175,0.1);
+    }
+
+    .otp-box.filled {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .resend-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: var(--text-weak);
+    }
+
+    .resend-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--primary);
+      font-family: inherit;
+      padding: 0;
+    }
+
+    .resend-btn:hover { text-decoration: underline; }
+
+    /* ── Details screen ── */
+    .details-scroll {
+      padding-bottom: 4px;
+    }
+
+    .details-section {
+      padding-bottom: 24px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .details-section:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 8px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text-strong);
+      margin-bottom: 14px;
+    }
+
+    .section-title svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--text-weak);
+      flex-shrink: 0;
+    }
+
+    .section-sub {
+      font-size: 13px;
+      color: var(--text-weak);
+      margin-bottom: 18px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .form-row.full { grid-template-columns: 1fr; }
+
+    .form-field { display: flex; flex-direction: column; gap: 4px; }
+
+    .field-input.sm { padding: 9px 12px; font-size: 13px; }
+
+    .phone-wrap {
+      display: flex;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+
+    .phone-wrap:focus-within {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30,64,175,0.1);
+    }
+
+    .phone-country {
+      padding: 9px 8px;
+      border: none;
+      border-right: 1px solid var(--border);
+      background: var(--surface-raised);
+      font-size: 12px;
+      font-family: inherit;
+      color: var(--text-base);
+      outline: none;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .phone-number {
+      flex: 1;
+      padding: 9px 10px;
+      border: none;
+      background: var(--surface);
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-strong);
+      outline: none;
+      min-width: 0;
+    }
+
+    /* Pet options */
+    .pet-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .pet-option:last-child { margin-bottom: 0; }
+
+    .pet-option.selected {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .pet-option input[type=radio] { display: none; }
+
+    .pet-radio {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 2px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: border-color 0.12s;
+    }
+
+    .pet-option.selected .pet-radio {
+      border-color: var(--primary);
+      background: var(--primary);
+    }
+
+    .pet-radio-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #fff;
+      display: none;
+    }
+
+    .pet-option.selected .pet-radio-dot { display: block; }
+
+    .pet-option-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-strong);
+    }
+
+    .pet-option-sub {
+      font-size: 12px;
+      color: var(--text-weak);
+      margin-left: 6px;
+    }
+
+    .pet-new-form {
+      display: none;
+      padding: 14px 14px 4px;
+      border: 1.5px solid var(--primary-border);
+      border-top: none;
+      border-bottom-left-radius: var(--radius-m);
+      border-bottom-right-radius: var(--radius-m);
+      background: var(--primary-light);
+      margin-top: -8px;
+      margin-bottom: 8px;
+    }
+
+    .pet-new-form.open { display: block; }
+
+    .pet-new-form .form-row { margin-bottom: 10px; }
+    .pet-new-form .form-row:last-child { margin-bottom: 0; }
+
+    /* Notes textarea */
+    .notes-textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text-strong);
+      background: var(--surface-raised);
+      resize: none;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      line-height: 1.5;
+    }
+
+    .notes-textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(30,64,175,0.1);
+      background: var(--surface);
+    }
+
+    .notes-counter {
+      font-size: 11px;
+      color: var(--text-weaker);
+      margin-top: 4px;
+    }
+
+    /* Checkboxes */
+    .checkbox-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+      cursor: pointer;
+    }
+
+    .checkbox-row input[type=checkbox] { display: none; }
+
+    .custom-checkbox {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: border-color 0.12s, background 0.12s;
+    }
+
+    .checkbox-row.checked .custom-checkbox {
+      background: var(--primary);
+      border-color: var(--primary);
+    }
+
+    .custom-checkbox svg { width: 11px; height: 11px; display: none; }
+    .checkbox-row.checked .custom-checkbox svg { display: block; }
+
+    .checkbox-label {
+      font-size: 13px;
+      color: var(--text-base);
+      line-height: 1.45;
+    }
+
+    .checkbox-label a { color: var(--primary); text-decoration: underline; }
+
+    /* Success screen */
+    .success-screen { text-align: center; padding: 8px 0 4px; }
+
+    .success-icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #f0fdf4;
+      border: 2px solid #bbf7d0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 16px;
+    }
+
+    .success-icon svg { width: 26px; height: 26px; }
+
+    .success-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text-strong);
+      margin-bottom: 6px;
+    }
+
+    .success-desc {
+      font-size: 13px;
+      color: var(--text-weak);
+      line-height: 1.6;
+      margin-bottom: 16px;
+    }
+
+    .success-summary {
+      border-radius: var(--radius-m);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      text-align: left;
+    }
+
+    .success-row {
+      display: flex;
+      gap: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+
+    .success-row + .success-row { border-top: 1px solid var(--border); }
+    .success-lbl { color: var(--text-weak); width: 72px; flex-shrink: 0; }
+    .success-val { color: var(--text-strong); font-weight: 500; }
+
+    /* ── Confirm screen ── */
+    .confirm-card {
+      border-radius: var(--radius-m);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .confirm-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      font-size: 13px;
+    }
+
+    .confirm-row + .confirm-row { border-top: 1px solid var(--border); }
+    .confirm-label { color: var(--text-weak); width: 80px; flex-shrink: 0; }
+    .confirm-value { color: var(--text-strong); font-weight: 500; }
+
+    .confirm-note {
+      font-size: 12px;
+      color: var(--text-weak);
+      text-align: center;
+      padding: 0 8px 4px;
+    }
+
+    /* ── Footer / CTA ── */
+    .widget-footer-actions { padding: 14px 20px 18px; }
+
+    .cta-btn {
+      width: 100%;
+      padding: 13px;
+      border-radius: var(--radius-m);
+      border: none;
+      background: var(--primary);
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, box-shadow 0.15s;
+      letter-spacing: 0.01em;
+    }
+
+    .cta-btn:hover { background: var(--primary-hover); box-shadow: 0 2px 8px rgba(30,64,175,0.3); }
+
+    .cta-btn:disabled {
+      background: var(--border);
+      color: var(--text-weaker);
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .cta-btn-outline {
+      width: 100%;
+      padding: 12px;
+      border-radius: var(--radius-m);
+      border: 1.5px solid var(--border);
+      background: var(--surface);
+      color: var(--text-base);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+    }
+
+    .cta-btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .footer-btn-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    /* ── Branding ── */
+    .widget-branding {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 10px 20px 14px;
+      border-top: 1px solid var(--surface-raised);
+    }
+
+    .branding-text { font-size: 11px; color: var(--text-weaker); opacity: 0.6; }
+    .branding-name { font-size: 11px; font-weight: 600; color: var(--text-weaker); opacity: 0.6; }
+
+    /* ── Manage screen ── */
+    .redirect-screen { text-align: center; padding: 12px 0 8px; }
+
+    .redirect-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+
+    .redirect-icon svg { width: 24px; height: 24px; }
+
+    .redirect-title { font-size: 16px; font-weight: 700; color: var(--text-strong); margin-bottom: 6px; }
+    .redirect-desc  { font-size: 13px; color: var(--text-weak); line-height: 1.55; }
+
+    /* ── Spinner ── */
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .spinner {
+      width: 15px;
+      height: 15px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+  </style>
+</head>
+<body>
+
+
+  <div class="widget" id="widget">
+
+    <!-- Header -->
+    <div class="widget-header">
+      <div class="header-row">
+        <button class="header-icon-btn" id="headerLeftBtn" onclick="headerLeftClick()"
+                aria-label="Back">
+          <svg id="headerLeftIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </button>
+        <div class="header-text">
+          <div class="header-clinic">Small Animal Clinic</div>
+          <div class="header-sub" id="headerSub">
+            <span class="header-step-label" id="headerStepLabel">Online booking</span>
+            <span class="header-dot" style="display:none"></span>
+            <button class="header-show-details" id="headerShowDetails" onclick="toggleSummary()" style="display:none">
+              Show details
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="progress-segments" id="progressSegments" style="display:none">
+        <div class="progress-seg" id="seg0"></div>
+        <div class="progress-seg" id="seg1"></div>
+        <div class="progress-seg" id="seg2"></div>
+        <div class="progress-seg" id="seg3"></div>
+        <div class="progress-seg" id="seg4"></div>
+      </div>
+    </div>
+
+    <!-- Summary panel -->
+    <div class="summary-content" id="summaryContent"></div>
+
+    <!-- Body -->
+    <div class="widget-body">
+
+      <!-- START -->
+      <div class="screen active" id="screen-start">
+        <div class="start-question">How can we help you today?</div>
+
+        <div class="start-actions">
+          <div class="action-primary" onclick="goTo('species')" role="button" tabindex="0">
+            <div class="action-icon">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="m18 2h-2v-2h-2v2h-8v-2h-2v2h-2c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-14c0-1.1-.9-2-2-2zm-14 2v2h2v-2h8v2h2v-2h2v4h-16v-4zm-2 14v-8h16v8z" fill="currentColor"/></svg>
+            </div>
+            <div class="action-primary-body">
+              <div class="action-primary-title">Book an appointment</div>
+              <div class="action-primary-meta">
+                <span class="avail-tag">Next available today</span>
+              </div>
+            </div>
+            <button class="action-book-btn" onclick="goTo('species')">Book</button>
+          </div>
+
+          <button class="action-secondary" onclick="goTo('manage')">
+            <div class="action-icon action-icon--secondary">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path clip-rule="evenodd" d="m18.9999 3.58501-2.59-2.58c-.78-.779997-2.05-.779997-2.83 0l-11.07 11.07999c-.28.28-.47.63-.55 1.02l-.94 4.7c-.069996.33.04.67.27.9.19.19.44.29.71.29.07 0 .13 0 .2-.02l4.71-.94c.39-.08.74-.27 1.02-.55l11.07-11.06999c.78-.78.78-2.05 0-2.83zm-12.49 12.49999-3.23.65.65-3.23 8.07-8.08999 2.59 2.59zm9.49-9.48999-2.59-2.59 1.59-1.59 2.59 2.59z" fill="currentColor" fill-rule="evenodd"/></svg>
+            </div>
+            <div class="action-secondary-body">
+              <div class="action-secondary-title">Manage booking</div>
+              <div class="action-secondary-desc">Edit or cancel an existing booking</div>
+            </div>
+            <div class="action-chevron">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </div>
+          </button>
+
+          <button class="action-secondary" onclick="">
+            <div class="action-icon action-icon--secondary">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="m10 8c-3.66 0-6 3.55-6 6 0 4 3.05 4 6 4s6 0 6-4c0-2.45-2.34-6-6-6zm0 8c-3.34 0-4-.16-4-2 0-1.41 1.52-4 4-4s4 2.59 4 4c0 1.84-.66 2-4 2zm-5-12c0-1.38.9-2.5 2-2.5s2 1.12 2 2.5-.9 2.5-2 2.5-2-1.12-2-2.5zm6 0c0-1.38.9-2.5 2-2.5s2 1.12 2 2.5-.9 2.5-2 2.5-2-1.12-2-2.5zm9 4c0 1.38-.9 2.5-2 2.5s-2-1.12-2-2.5.9-2.5 2-2.5 2 1.12 2 2.5zm-16 0c0 1.38-.9 2.5-2 2.5s-2-1.12-2-2.5.9-2.5 2-2.5 2 1.12 2 2.5z" fill="currentColor"/></svg>
+            </div>
+            <div class="action-secondary-body">
+              <div class="action-secondary-title">Register a pet</div>
+              <div class="action-secondary-desc">Add a new patient to our records</div>
+            </div>
+            <div class="action-chevron">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </div>
+          </button>
+
+          <button class="action-secondary" onclick="">
+            <div class="action-icon action-icon--secondary">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="m18 0h-16c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h2v5c0 .4.24.77.62.92.12.05.25.08.38.08.26 0 .52-.1.71-.29l5.71-5.71h6.59c1.1 0 2-.9 2-2v-10c-.01-1.1-.91-2-2.01-2zm0 12h-7c-.27 0-.52.11-.71.29l-4.29 4.29v-3.59c0-.55-.45-1-1-1h-3v-9.99h16z" fill="currentColor"/></svg>
+            </div>
+            <div class="action-secondary-body">
+              <div class="action-secondary-title">Send a message</div>
+              <div class="action-secondary-desc">Contact the clinic directly</div>
+            </div>
+            <div class="action-chevron">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </div>
+          </button>
+
+          <button class="action-secondary" onclick="">
+            <div class="action-icon action-icon--secondary">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="m18 2h-16c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-12c0-1.1-.9-2-2-2zm0 2v2h-16v-2zm-16 12v-8h16v8zm10-4h4v2h-4z" fill="currentColor"/></svg>
+            </div>
+            <div class="action-secondary-body">
+              <div class="action-secondary-title">Pay online</div>
+              <div class="action-secondary-desc">Pay for your visit securely online</div>
+            </div>
+            <div class="action-chevron">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 1: SPECIES -->
+      <div class="screen" id="screen-species">
+        <div class="step-question">Select pet species</div>
+        <div class="species-grid" id="speciesGrid">
+          <button class="species-btn" onclick="selectSpecies('dog', 'Dog', this)">
+            <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="m12.0001 12.9901c0 .55-.45 1-1 1v1c0 .55-.45 1-1 1-.55003 0-1.00003-.45-1.00003-1v-1c-.55 0-1-.45-1-1s.45-1 1-1h2.00003c.55 0 1 .45 1 1zm-5.00003-5.49997c-.55 0-1 .67-1 1.5s.45 1.49997 1 1.49997 1-.66997 1-1.49997-.45-1.5-1-1.5zm6.00003 0c-.55 0-1 .67-1 1.5s.45 1.49997 1 1.49997 1-.66997 1-1.49997-.45-1.5-1-1.5zm6.98 4.49997c.04.89-.36 1.79-1.06 2.38l-5.71 4.89c-.54.47-1.24.72-1.95.72h-2.52003c-.72 0-1.41-.25-1.94-.71l-5.72-4.9c-.699995-.6-1.0999954-1.49-1.0599955-2.38.2000005-4.53997 1.6699955-9.01997 3.7599955-11.419967.3-.34.74-.5399995 1.2-.5499995.44.02.91.1899995 1.23.5299995.87.959997 1.61 2.129997 2.21 3.489997 1.16-.08 2.00003-.08 3.15003 0 .6-1.37 1.34-2.54 2.21-3.489997.31-.34.77-.5399995 1.23-.5299995.46 0 .9.2099995 1.2.5499995 2.09 2.399997 3.56 6.879997 3.76 11.419967zm-2 .09c-.17-3.83997-1.35-7.70997-2.99-9.84997-.72.87-1.35 1.98-1.83 3.23-.16.41-.58.67-1.02.64-1.7-.14-2.59003-.14-4.28003 0-.43.04-.86-.22-1.02-.64-.48-1.25-1.11-2.36-1.83-3.23-1.64 2.14-2.83 6.02-2.99 9.84997-.01.29.12.58.36.78l5.72 4.9c.18.15.4.23.64.23h2.52003c.24 0 .47-.09.65-.24l5.71-4.89c.24-.2.37-.49.36-.78z" fill="currentColor"/>
+            </svg>
+            Dog
+          </button>
+          <button class="species-btn" onclick="selectSpecies('cat', 'Cat', this)">
+            <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="m8.2 10.0074c0 .8302-.54 1.5005-1.2 1.5005s-1.2-.6703-1.2-1.5005c0-.8303.54-1.50052 1.2-1.50052s1.2.67022 1.2 1.50052zm4.8-1.50052c-.66 0-1.2.67022-1.2 1.50052 0 .8302.54 1.5005 1.2 1.5005s1.2-.6703 1.2-1.5005c0-.8303-.54-1.50052-1.2-1.50052zm7 5.50182h-2.59l2 2.0006-1.41 1.4105-2.07-2.0707c-1.47 1.6206-3.58 2.6509-5.93 2.6509s-4.47-1.0303-5.93-2.6509l-2.07 2.0707-1.41-1.4105 2-2.0006h-2.59v-2.0007h2.26c-.17-.6402-.26-1.3104-.26-2.0006v-9.00299c0-.400133.24-.770255.62-.9203041.37-.1600527.8-.070023 1.09.2200721l2.61 2.610862c2.27-1.19039 5.09-1.19039 7.36 0l2.61-2.620865c.29-.29009545.71-.3701218 1.09-.2200724.37.1500494.62.5201714.62.9203024v9.012995c0 .6902-.1 1.3604-.26 2.0006h2.26zm-5.48-.07-.23-.2301c-.29-.2901-.37-.7202-.22-1.0904.15-.3701.52-.6202.92-.6202h.65c.22-.6302.35-1.3004.35-2.00063v-6.58217l-1.45 1.45048c-.34.34011-.86.39013-1.26.13004-1.97-1.30043-4.62-1.30043-6.58 0-.4.26009-.92.21007-1.26-.13004l-1.45-1.45048v6.5922c0 .7002.13 1.3704.35 2.0006h.65c.4 0 .77.2401.92.6202.15.3702.07.8003-.22 1.0904l-.23.2301c1.1 1.2604 2.72 2.0706 4.52 2.0706s3.42-.8002 4.52-2.0706zm-3.81-2.6409c-.39-.3901-1.02-.3901-1.41 0l-1 1.0003c-.39.3902-.39 1.0204 0 1.4105s1.02.3901 1.41 0l.29-.2901.29.2901c.2.2001.45.2901.71.2901s.51-.1.71-.2901c.39-.3901.39-1.0203 0-1.4105z" fill="currentColor"/>
+            </svg>
+            Cat
+          </button>
+          <button class="species-btn" onclick="selectSpecies('rabbit', 'Rabbit', this)">
+            <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path d="m15.63 7.02752c.08-.19.16-.37.24-.57.93-2.62.89-5.64-.98-6.33-.37-.14-.96-.23-1.69.11-1.19.55-2.37 2.13-3.07 4.11-.04.13-.09.25-.13.39-.04-.13-.09-.26-.13-.39-.7-1.98-1.88-3.56-3.07-4.11-.73-.34-1.32-.25-1.69-.11-1.87.7-1.91 3.71-.98 6.33.07.2.16.38.24.57-2.01 1.23-3.37 3.43998-3.37 5.96998 0 3.86 3.14 7 7 7h4c3.86 0 7-3.14 7-7 0-2.53-1.35-4.73998-3.37-5.96998zm-3.63 10.96998h-4c-2.76 0-5-2.24-5-5 0-1.77.93-3.31998 2.32-4.20998.16.23.33.45.51.66l1.68-1.12c-.58-.58-1.12-1.49-1.49-2.54-.74-2.09-.47-3.61-.22-3.79.29.02 1.43.87 2.19 3.02.49 1.4.89 3.42 1 3.98h2.03c.11-.57.5-2.59 1-3.98.76-2.14 1.89-3.03 2.16-3.02.28.19.54 1.71-.2 3.8-.37 1.05-.91 1.96-1.49 2.54l1.68 1.12c.17-.2.34-.42.51-.66 1.39.89 2.32 2.43998 2.32 4.20998 0 2.76-2.24 5-5 5zm-.29-3.71c.39.39.39 1.02 0 1.41-.2.2-.45.29-.71.29s-.51-.1-.71-.29l-.29-.29-.29.29c-.39.39-1.02.39-1.41 0s-.39-1.02 0-1.41l1-1c.39-.39 1.02-.39 1.41 0zm-3.51-1.29c0 .83-.54 1.5-1.2 1.5s-1.2-.67-1.2-1.5.54-1.5 1.2-1.5 1.2.67 1.2 1.5zm6 0c0 .83-.54 1.5-1.2 1.5s-1.2-.67-1.2-1.5.54-1.5 1.2-1.5 1.2.67 1.2 1.5z" fill="currentColor"/>
+            </svg>
+            Rabbit
+          </button>
+          <button class="show-more-btn" id="showMoreBtn" onclick="showMoreSpecies()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+            More species
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 2: REASON FOR VISIT -->
+      <div class="screen" id="screen-treatment">
+        <div class="step-question">Select reason for visit</div>
+        <div class="treatment-scroll" id="treatmentList"></div>
+      </div>
+
+      <!-- STEP 3: DATE + TIME -->
+      <div class="screen" id="screen-date">
+        <div id="dateStep"></div>
+      </div>
+
+      <!-- STEP 4: EMAIL -->
+      <div class="screen" id="screen-email">
+        <div class="step-question">Enter your email</div>
+        <p class="email-hint">You'll receive a verification code by email.</p>
+        <div class="field-label">
+          Email <span class="field-required">*</span>
+        </div>
+        <input
+          class="field-input"
+          id="emailInput"
+          type="email"
+          placeholder="your@email.com"
+          autocomplete="email"
+          oninput="onEmailInput()"
+          onkeydown="if(event.key==='Enter') trySendOtp()"
+        />
+        <div class="field-error" id="emailError"></div>
+      </div>
+
+      <!-- STEP 4b: OTP -->
+      <div class="screen" id="screen-otp">
+        <div class="step-question">Check your inbox</div>
+        <div class="sent-notice" id="sentNotice">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          <span>We sent a 6-digit code to <strong id="sentEmail"></strong>. Enter it below.</span>
+        </div>
+        <div class="otp-grid" id="otpGrid">
+          <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+          <input class="otp-box" maxlength="1" inputmode="numeric" pattern="[0-9]" />
+        </div>
+        <div class="field-error" id="otpError"></div>
+        <div class="resend-row">
+          Didn't receive it?
+          <button class="resend-btn" onclick="resendOtp()">Resend code</button>
+        </div>
+      </div>
+
+      <!-- STEP 5: YOUR DETAILS -->
+      <div class="screen" id="screen-details">
+        <div class="step-question">Your details</div>
+        <div class="details-scroll" id="detailsScroll">
+
+          <!-- Owner information -->
+          <div class="details-section">
+            <div class="section-title">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="m10 10c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0-8c1.65 0 3 1.35 3 3s-1.35 3-3 3-3-1.35-3-3 1.35-3 3-3zm8 18h-2c0-3.31-2.69-6-6-6s-6 2.69-6 6h-2c0-4.41 3.59-8 8-8s8 3.59 8 8z" fill="currentColor"/></svg>
+              Owner information
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <div class="field-label">First name <span class="field-required">*</span></div>
+                <input id="dFirstName" class="field-input sm" type="text" autocomplete="given-name" oninput="onDetailsInput()" />
+              </div>
+              <div class="form-field">
+                <div class="field-label">Last name <span class="field-required">*</span></div>
+                <input id="dLastName" class="field-input sm" type="text" autocomplete="family-name" oninput="onDetailsInput()" />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <div class="field-label">Email <span class="field-required">*</span></div>
+                <input id="dEmail" class="field-input sm" type="email" autocomplete="email" oninput="onDetailsInput()" />
+              </div>
+              <div class="form-field">
+                <div class="field-label">Phone number <span class="field-required">*</span></div>
+                <div class="phone-wrap">
+                  <select id="dPhoneCountry" class="phone-country">
+                    <option>FI (+358)</option>
+                    <option>SE (+46)</option>
+                    <option>NO (+47)</option>
+                    <option>DK (+45)</option>
+                    <option>GB (+44)</option>
+                    <option>DE (+49)</option>
+                  </select>
+                  <input id="dPhone" class="phone-number" type="tel" placeholder="000000000" autocomplete="tel-national" oninput="onDetailsInput()" />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-field">
+                <div class="field-label">Street name <span class="field-required">*</span></div>
+                <input id="dStreet" class="field-input sm" type="text" autocomplete="street-address" oninput="onDetailsInput()" />
+              </div>
+              <div class="form-field">
+                <div class="field-label">City <span class="field-required">*</span></div>
+                <input id="dCity" class="field-input sm" type="text" autocomplete="address-level2" oninput="onDetailsInput()" />
+              </div>
+            </div>
+
+            <div class="form-row full">
+              <div class="form-field">
+                <div class="field-label">Postal code <span class="field-required">*</span></div>
+                <input id="dPostal" class="field-input sm" type="text" autocomplete="postal-code" style="max-width:180px" oninput="onDetailsInput()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Pet information -->
+          <div class="details-section">
+            <div class="section-title">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="m10 8c-3.66 0-6 3.55-6 6 0 4 3.05 4 6 4s6 0 6-4c0-2.45-2.34-6-6-6zm0 8c-3.34 0-4-.16-4-2 0-1.41 1.52-4 4-4s4 2.59 4 4c0 1.84-.66 2-4 2zm-5-12c0-1.38.9-2.5 2-2.5s2 1.12 2 2.5-.9 2.5-2 2.5-2-1.12-2-2.5zm6 0c0-1.38.9-2.5 2-2.5s2 1.12 2 2.5-.9 2.5-2 2.5-2-1.12-2-2.5zm9 4c0 1.38-.9 2.5-2 2.5s-2-1.12-2-2.5.9-2.5 2-2.5 2 1.12 2 2.5zm-16 0c0 1.38-.9 2.5-2 2.5s-2-1.12-2-2.5.9-2.5 2-2.5 2 1.12 2 2.5z" fill="currentColor"/></svg>
+              Pet information
+            </div>
+
+            <div class="form-row full">
+              <div class="form-field">
+                <div class="field-label">Pet name <span class="field-required">*</span></div>
+                <input id="petName" class="field-input sm" type="text" placeholder="e.g. Whiskers" oninput="onDetailsInput()" />
+              </div>
+            </div>
+
+            <div class="form-row full">
+              <div class="form-field">
+                <div class="field-label">Species</div>
+                <div id="petSpeciesGrid" class="species-grid pet-species-grid"></div>
+              </div>
+            </div>
+
+            <div class="form-row full">
+              <div class="form-field">
+                <div class="field-label">Breed</div>
+                <input id="petBreed" class="field-input sm" type="text" placeholder="e.g. Labrador" oninput="onDetailsInput()" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Additional information -->
+          <div class="details-section">
+            <div class="section-title">
+              <svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="m1.78 0h10.22v2h-9.98l-.02 16h10v2h-10.22c-.98 0-1.78-.9-1.78-2v-16c0-1.1.8-2 1.78-2zm18.22 5v13c0 1.12-.73 2-1.67 2h-2.67c-.93 0-1.67-.88-1.67-2v-13c0-.2.06-.39.17-.55l2-3c.37-.56 1.29-.56 1.66 0l2 3c.11.16.17.36.17.55zm-4 .3v8.7h2v-8.7l-1-1.5zm2 12.7v-2h-2v2zm-14-10h8v-2h-8z" fill="currentColor"/></svg>
+              Additional information
+            </div>
+
+            <div class="field-label" style="margin-bottom:6px">Notes for vet</div>
+            <textarea id="dNotes" class="notes-textarea" rows="4" maxlength="1000"
+              placeholder="Any additional information for the vet…"
+              oninput="document.getElementById('notesCount').textContent = this.value.length + '/1000'"></textarea>
+            <div class="notes-counter" id="notesCount">0/1000</div>
+
+            <label class="checkbox-row" id="termsRow" onclick="toggleCheckbox('termsRow', 'termsCheck', onDetailsInput)">
+              <input type="checkbox" id="termsCheck" />
+              <div class="custom-checkbox">
+                <svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 5 9 10 3"/>
+                </svg>
+              </div>
+              <span class="checkbox-label">
+                I agree to the <a href="#" onclick="return false">privacy policy</a> and
+                <a href="#" onclick="return false">terms of service</a>
+                <span class="field-required">*</span>
+              </span>
+            </label>
+
+            <label class="checkbox-row" id="createAccountRow" onclick="toggleCheckbox('createAccountRow', 'createAccountCheck', null)">
+              <input type="checkbox" id="createAccountCheck" />
+              <div class="custom-checkbox">
+                <svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.2"
+                     stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="2 6 5 9 10 3"/>
+                </svg>
+              </div>
+              <span class="checkbox-label">
+                Create a Provet account to manage bookings, view pet details, and book faster next time.
+              </span>
+            </label>
+          </div>
+
+        </div><!-- /detailsScroll -->
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="screen" id="screen-confirm">
+        <div class="success-screen">
+          <div class="success-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div class="success-title">Booking confirmed!</div>
+          <div class="success-desc">
+            A confirmation has been sent to <strong id="successEmail"></strong>.
+            We look forward to seeing you.
+          </div>
+          <div class="success-summary">
+            <div class="success-row">
+              <span class="success-lbl">Clinic</span>
+              <span class="success-val">Ambivet Heanor</span>
+            </div>
+            <div class="success-row">
+              <span class="success-lbl">Reason</span>
+              <span class="success-val" id="successTreatment">—</span>
+            </div>
+            <div class="success-row">
+              <span class="success-lbl">Date</span>
+              <span class="success-val" id="successDate">—</span>
+            </div>
+            <div class="success-row">
+              <span class="success-lbl">Time</span>
+              <span class="success-val" id="successTime">—</span>
+            </div>
+            <div class="success-row">
+              <span class="success-lbl">Pet</span>
+              <span class="success-val" id="successPet">—</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAGE -->
+      <div class="screen" id="screen-manage">
+        <div class="redirect-screen">
+          <div class="redirect-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#1e40af" stroke-width="2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/>
+              <polyline points="10 17 15 12 10 7"/>
+              <line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+          </div>
+          <div class="redirect-title">Manage your booking</div>
+          <div class="redirect-desc">Sign in to the Provet patient portal to edit or cancel an existing appointment.</div>
+        </div>
+      </div>
+
+    </div><!-- /widget-body -->
+
+    <!-- Footer CTA -->
+    <div class="widget-footer-actions" id="footerActions"></div>
+
+    <!-- Branding -->
+    <div class="widget-branding">
+      <span class="branding-text">Powered by</span>
+      <span class="branding-name">Provet</span>
+    </div>
+
+  </div><!-- /widget -->
+
+  <script>
+    // ── State ──────────────────────────────────────────────
+    const state = {
+      screen: 'start',
+      speciesId: null,
+      speciesName: null,
+      treatmentId: null,
+      treatmentName: null,
+      date: null,
+      time: null,
+      email: null,
+      otpVerified: false,
+      petName: null,
+      petSpeciesId: null,
+      petSpeciesName: null,
+    };
+
+    // Mock existing user — in production this comes from the API after OTP verification
+    const MOCK_USER = {
+      email: 'olli.venemies@nordhealth.com',
+      firstName: 'Olli',
+      lastName: 'Venemies',
+      phone: '440731192',
+      phoneCountry: 'FI (+358)',
+      street: 'Tekniikantie 12',
+      city: 'Helsinki',
+      postalCode: '00210',
+      pets: [
+        { id: 1, name: 'Whiskers', species: 'cat' },
+        { id: 2, name: 'Max', species: 'dog' },
+      ],
+    };
+
+    // ── Data ───────────────────────────────────────────────
+    const ALL_SPECIES = [
+      { id: 'cat',        name: 'Cat' },
+      { id: 'dog',        name: 'Dog' },
+      { id: 'rabbit',     name: 'Rabbit' },
+      { id: 'bird',       name: 'Bird' },
+      { id: 'guinea_pig', name: 'Guinea pig' },
+      { id: 'other',      name: 'Other' },
+    ];
+
+    const TREATMENT_CATEGORIES = [
+      {
+        name: 'Consultation',
+        reasons: [
+          { id: 10, name: 'Consultation 20 min', duration: '20 min' },
+          { id: 11, name: 'Consultation 40 min', duration: '40 min' },
+          { id: 12, name: 'Consultation 60 min', duration: '60 min' },
+        ],
+      },
+      {
+        name: 'Diagnostics',
+        reasons: [
+          { id: 20, name: 'Ear investigation with sedation', duration: '60 min' },
+          { id: 21, name: 'Eye investigation', duration: '40 min' },
+          { id: 22, name: 'Itching investigation', duration: '40 min' },
+          { id: 23, name: 'Lameness investigation with sedation', duration: '60 min' },
+          { id: 24, name: 'Urinary tract investigation', duration: '40 min' },
+        ],
+      },
+      {
+        name: 'Emergency',
+        reasons: [
+          { id: 30, name: 'Cat bite wound', duration: '30 min' },
+          { id: 31, name: 'Emergency', duration: '30 min' },
+        ],
+      },
+      {
+        name: 'Health check',
+        reasons: [
+          { id: 40, name: 'Extended senior health check', duration: '60 min' },
+          { id: 41, name: 'Health check', duration: '30 min' },
+          { id: 42, name: 'Recovery check-up', duration: '20 min' },
+          { id: 43, name: 'Senior health check', duration: '40 min' },
+        ],
+      },
+      {
+        name: 'Injections',
+        reasons: [
+          { id: 50, name: 'Injection Cytopoint', duration: '15 min' },
+          { id: 51, name: 'Injection Librela', duration: '15 min' },
+          { id: 52, name: 'Injection Solensia', duration: '15 min' },
+        ],
+      },
+      {
+        name: 'Nail clipping',
+        reasons: [
+          { id: 60, name: 'Nail clipping with sedation', duration: '30 min' },
+          { id: 61, name: 'Nail clipping without sedation', duration: '15 min' },
+        ],
+      },
+      {
+        name: 'Neutering',
+        reasons: [
+          { id: 70, name: 'Chemical castration', duration: '30 min' },
+          { id: 71, name: 'Neutering female cat', duration: '60 min' },
+          { id: 72, name: 'Neutering female guinea pig', duration: '60 min' },
+          { id: 73, name: 'Neutering female rabbit', duration: '60 min' },
+          { id: 74, name: 'Neutering male cat', duration: '40 min' },
+          { id: 75, name: 'Neutering male guinea pig', duration: '40 min' },
+          { id: 76, name: 'Neutering male rabbit', duration: '40 min' },
+        ],
+      },
+      {
+        name: 'Pregnancy',
+        reasons: [
+          { id: 80, name: 'Ultrasound pregnancy', duration: '20 min' },
+          { id: 81, name: 'X-ray pregnancy', duration: '20 min' },
+        ],
+      },
+      {
+        name: 'Prescription',
+        reasons: [
+          { id: 90, name: 'Prescription – pick up at clinic', duration: '10 min' },
+          { id: 91, name: 'Prescription – sent to pharmacy', duration: '10 min' },
+        ],
+      },
+      {
+        name: 'Teeth',
+        reasons: [
+          { id: 100, name: 'Dental check', duration: '30 min' },
+          { id: 101, name: 'Dental cleaning cat', duration: '60 min' },
+          { id: 102, name: 'Dental cleaning dog', duration: '60 min' },
+          { id: 103, name: 'Dental cleaning heart patient', duration: '60 min' },
+        ],
+      },
+      {
+        name: 'Vaccines',
+        reasons: [
+          { id: 110, name: 'Annual vaccine dog/cat', duration: '15 min' },
+          { id: 111, name: 'Vaccine 12 weeks puppy/kitten', duration: '15 min' },
+          { id: 112, name: 'Vaccine 16 weeks puppy/kitten', duration: '15 min' },
+          { id: 113, name: 'Vaccine 6 months puppy/kitten', duration: '15 min' },
+          { id: 114, name: 'Vaccine 8 weeks puppy', duration: '15 min' },
+          { id: 115, name: 'Vaccine Leptospirosis', duration: '15 min' },
+          { id: 116, name: 'Vaccine rabies', duration: '15 min' },
+        ],
+      },
+    ];
+
+    // All possible time slots: 08:00–17:00 every 20 min
+    const ALL_SLOTS = (() => {
+      const slots = [];
+      for (let h = 8; h <= 17; h++) {
+        for (let m = 0; m < 60; m += 20) {
+          if (h === 17 && m > 0) break;
+          const hh = String(h).padStart(2, '0');
+          const mm = String(m).padStart(2, '0');
+          slots.push(`${hh}:${mm}`);
+        }
+      }
+      return slots; // 28 slots: 08:00 … 17:00
+    })();
+
+    // Available dates → available time slots (seeded mock)
+    function buildAvailability() {
+      const map = {};
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      for (let i = 0; i <= 42; i++) {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        if (d.getDay() === 0 || d.getDay() === 6) continue; // skip weekends
+        const iso = d.toISOString().slice(0, 10);
+        if (i === 0) {
+          // Today always has slots (afternoon onwards in mock)
+          map[iso] = ALL_SLOTS.filter((_, idx) => idx >= 6 && Math.random() > 0.3);
+        } else {
+          if (Math.random() < 0.25) continue; // ~25% days fully booked
+          map[iso] = ALL_SLOTS.filter(() => Math.random() > 0.35);
+        }
+      }
+      return map;
+    }
+
+    const AVAILABILITY = buildAvailability();
+
+    // ── Progress ───────────────────────────────────────────
+    const STEP_SEGS = {
+      start: 0, species: 1, treatment: 2, date: 3,
+      email: 4, otp: 4, details: 5, confirm: 5, manage: 0,
+    };
+
+    function updateProgress(screen) {
+      const segments = document.getElementById('progressSegments');
+      const showSegs = screen !== 'start' && screen !== 'manage' && screen !== 'confirm';
+      segments.style.display = showSegs ? 'flex' : 'none';
+      const filled = STEP_SEGS[screen] ?? 0;
+      for (let i = 0; i < 5; i++) {
+        document.getElementById(`seg${i}`).classList.toggle('filled', i < filled);
+      }
+    }
+
+    // ── Navigation ─────────────────────────────────────────
+    function goTo(screen) {
+      document.getElementById(`screen-${state.screen}`).classList.remove('active');
+      state.screen = screen;
+      document.getElementById(`screen-${screen}`).classList.add('active');
+      updateProgress(screen);
+      if (screen === 'treatment') renderTreatments();
+      if (screen === 'date') renderDateStep();
+      if (screen === 'email') initEmailScreen();
+      if (screen === 'otp') initOtpScreen();
+      if (screen === 'details') initDetailsScreen();
+      if (screen === 'confirm') renderSuccess();
+      updateSummaryBar();
+      renderFooter();
+    }
+
+    function goBack(current) {
+      const map = {
+        species: 'start', treatment: 'species',
+        date: 'treatment', email: 'date', otp: 'email',
+        details: 'otp', manage: 'start',
+      };
+      goTo(map[current]);
+    }
+
+    // ── Species ────────────────────────────────────────────
+    function selectSpecies(id, name, btn) {
+      document.querySelectorAll('.species-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.speciesId = id;
+      state.speciesName = name;
+      state.treatmentId = null;
+      state.treatmentName = null;
+      state.date = null;
+      state.time = null;
+      setTimeout(() => goTo('treatment'), 200);
+    }
+
+    let moreShown = false;
+
+    function showMoreSpecies() {
+      if (moreShown) return;
+      moreShown = true;
+      const grid = document.getElementById('speciesGrid');
+      const moreBtn = document.getElementById('showMoreBtn');
+      ALL_SPECIES.slice(3).forEach(sp => {
+        const btn = document.createElement('button');
+        btn.className = 'species-btn text-only';
+        btn.textContent = sp.name;
+        btn.onclick = () => selectSpecies(sp.id, sp.name, btn);
+        grid.insertBefore(btn, moreBtn);
+      });
+      moreBtn.remove();
+    }
+
+    // ── Treatments ─────────────────────────────────────────
+    function renderTreatments() {
+      const container = document.getElementById('treatmentList');
+      container.innerHTML = '';
+
+      TREATMENT_CATEGORIES.forEach(cat => {
+        const block = document.createElement('div');
+        block.className = 'category-block';
+
+        const header = document.createElement('div');
+        header.className = 'category-header';
+        header.innerHTML = `
+          <span class="category-name">${cat.name}</span>
+          <span class="category-chevron">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                 stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"/>
+            </svg>
+          </span>`;
+
+        const items = document.createElement('div');
+        items.className = 'category-items';
+
+        cat.reasons.forEach(r => {
+          const btn = document.createElement('button');
+          btn.className = 'reason-btn' + (state.treatmentId === r.id ? ' selected' : '');
+          btn.innerHTML = `
+            <div class="reason-btn-body">
+              <span class="reason-btn-name">${r.name}</span>
+              ${r.duration ? `<span class="reason-btn-duration">${r.duration}</span>` : ''}
+            </div>
+            <span class="reason-chevron">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </span>`;
+          btn.onclick = () => {
+            document.querySelectorAll('.reason-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            state.treatmentId = r.id;
+            state.treatmentName = r.name;
+            setTimeout(() => goTo('date'), 200);
+          };
+          items.appendChild(btn);
+        });
+
+        header.onclick = () => {
+          const isOpen = header.classList.contains('open');
+          container.querySelectorAll('.category-header').forEach(h => h.classList.remove('open'));
+          container.querySelectorAll('.category-items').forEach(i => i.classList.remove('open'));
+          if (!isOpen) {
+            header.classList.add('open');
+            items.classList.add('open');
+          }
+        };
+
+        block.appendChild(header);
+        block.appendChild(items);
+        container.appendChild(block);
+
+        if (state.treatmentId && cat.reasons.some(r => r.id === state.treatmentId)) {
+          header.classList.add('open');
+          items.classList.add('open');
+        }
+      });
+    }
+
+    // ── Header / summary ───────────────────────────────────
+    const STEP_LABELS = {
+      species: 'Step 1 of 5', treatment: 'Step 2 of 5', date: 'Step 3 of 5',
+      email: 'Step 4 of 5', otp: 'Step 4 of 5', details: 'Step 5 of 5',
+    };
+
+    const CLINIC_ICON = `<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>`;
+    const BACK_ICON = `<polyline points="15 18 9 12 15 6"/>`;
+    const NO_BACK = new Set(['start', 'confirm']);
+
+    function headerLeftClick() {
+      if (NO_BACK.has(state.screen)) return;
+      goBack(state.screen);
+    }
+
+    function updateLeftBtn(screen) {
+      const btn = document.getElementById('headerLeftBtn');
+      const icon = document.getElementById('headerLeftIcon');
+      if (NO_BACK.has(screen)) {
+        icon.setAttribute('stroke-width', '1.8');
+        icon.innerHTML = CLINIC_ICON;
+        btn.style.cursor = 'default';
+        btn.setAttribute('aria-label', 'Clinic');
+      } else {
+        icon.setAttribute('stroke-width', '2.2');
+        icon.innerHTML = BACK_ICON;
+        btn.style.cursor = 'pointer';
+        btn.setAttribute('aria-label', 'Back');
+      }
+    }
+
+    function updateSummaryBar() {
+      const s = state.screen;
+      const headerSub = document.getElementById('headerSub');
+      const stepLabel = document.getElementById('headerStepLabel');
+
+      updateLeftBtn(s);
+
+      // Sub-row with step label + show details — always visible
+      headerSub.style.display = 'flex';
+      const isBooking = s !== 'start' && s !== 'manage' && s !== 'confirm';
+      stepLabel.textContent = isBooking ? (STEP_LABELS[s] || '') : 'Online booking';
+
+      const showDetailsBtn = document.getElementById('headerShowDetails');
+      const dot = document.querySelector('.header-dot');
+      if (!isBooking) {
+        document.getElementById('summaryContent').classList.remove('open');
+        if (showDetailsBtn) showDetailsBtn.style.display = 'none';
+        if (dot) dot.style.display = 'none';
+        return;
+      }
+      if (showDetailsBtn) showDetailsBtn.style.display = '';
+      if (dot) dot.style.display = '';
+
+      // Build rows: always show Clinic, then selections made so far
+      const allRows = [{ lbl: 'Clinic', val: 'Small Animal Clinic' }];
+      if (state.speciesName)   allRows.push({ lbl: 'Species',   val: state.speciesName });
+      if (state.treatmentName) allRows.push({ lbl: 'Treatment', val: state.treatmentName });
+      if (state.date) {
+        const d = new Date(state.date + 'T00:00:00');
+        allRows.push({ lbl: 'Date', val: `${d.getDate()}.${d.getMonth() + 1}.${d.getFullYear()}` });
+      }
+      if (state.time) allRows.push({ lbl: 'Time', val: formatTime(state.time) });
+
+      document.getElementById('summaryContent').innerHTML = `
+        <div class="summary-rows">
+          ${allRows.map(r => `
+            <div class="summary-row">
+              <span class="summary-lbl">${r.lbl}</span>
+              <span class="summary-val">${r.val}</span>
+            </div>`).join('')}
+        </div>`;
+    }
+
+    function toggleSummary() {
+      const content = document.getElementById('summaryContent');
+      const btn = document.getElementById('headerShowDetails');
+      const isOpen = content.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.firstChild.textContent = isOpen ? 'Hide details ' : 'Show details ';
+    }
+
+    // ── Date + time picker ─────────────────────────────────
+    let weekStart = null; // Monday of current week
+
+    function getMondayOf(d) {
+      const date = new Date(d);
+      date.setHours(0, 0, 0, 0);
+      const dow = (date.getDay() + 6) % 7; // Mon=0
+      date.setDate(date.getDate() - dow);
+      return date;
+    }
+
+    function isoOf(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function renderDateStep() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (!state.date) {
+        state.date = isoOf(today);
+      }
+      weekStart = new Date(new Date(state.date + 'T00:00:00'));
+      renderWeekStrip();
+      renderTimeSlots();
+    }
+
+    function formatTime(t) {
+      const [h, m] = t.split(':');
+      return `${parseInt(h)}.${m}`;
+    }
+
+    function renderWeekStrip() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayIso = isoOf(today);
+
+      const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const isPrevDisabled = weekStart <= today;
+
+      let daysHtml = '';
+      for (let i = 0; i < 4; i++) {
+        const d = new Date(weekStart);
+        d.setDate(weekStart.getDate() + i);
+        const iso = isoOf(d);
+        const isPast = d < today;
+        const hasSlots = !isPast && AVAILABILITY[iso] && AVAILABILITY[iso].length > 0;
+        const isSelected = state.date === iso;
+        const isToday = iso === todayIso;
+        const dowName = DAY_NAMES[(d.getDay() + 6) % 7];
+        const dateLabel = `${d.getDate()}.${d.getMonth() + 1}.`;
+
+        const classes = ['day-card',
+          isSelected ? 'selected' : '',
+          isToday ? 'today' : '',
+        ].filter(Boolean).join(' ');
+
+        daysHtml += `
+          <button class="${classes}" ${isPast && !isToday ? 'disabled' : ''}
+                  onclick="${hasSlots || isToday ? `selectDay('${iso}')` : ''}">
+            <span class="day-card-name">${dowName}</span>
+            <span class="day-card-date">${dateLabel}</span>
+            ${hasSlots ? '<span class="avail-dot"></span>' : '<span style="height:5px"></span>'}
+          </button>`;
+      }
+
+      const container = document.getElementById('dateStep');
+      let nav = container.querySelector('.week-nav-wrap');
+      if (!nav) {
+        nav = document.createElement('div');
+        nav.className = 'week-nav-wrap';
+        container.prepend(nav);
+      }
+
+      nav.innerHTML = `
+        <div class="date-section-header">
+          <span class="date-section-title">Choose date</span>
+          <div class="week-nav-btns">
+            <button class="week-nav-btn" title="Calendar" style="cursor:default">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"/>
+                <line x1="16" y1="2" x2="16" y2="6"/>
+                <line x1="8" y1="2" x2="8" y2="6"/>
+                <line x1="3" y1="10" x2="21" y2="10"/>
+              </svg>
+            </button>
+            <button class="week-nav-btn" onclick="prevWeek()" ${isPrevDisabled ? 'disabled' : ''}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"/>
+              </svg>
+            </button>
+            <button class="week-nav-btn" onclick="nextStrip()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+                   stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="9 18 15 12 9 6"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+        <div class="week-strip">${daysHtml}</div>`;
+    }
+
+    function renderTimeSlots() {
+      const container = document.getElementById('dateStep');
+      let timesSection = container.querySelector('.times-section');
+      if (!timesSection) {
+        timesSection = document.createElement('div');
+        timesSection.className = 'times-section';
+        container.appendChild(timesSection);
+      }
+
+      if (!state.date) {
+        timesSection.innerHTML = '';
+        return;
+      }
+
+      const slots = AVAILABILITY[state.date] || [];
+      if (slots.length === 0) {
+        timesSection.innerHTML = `<p class="times-empty">No availability on this day. Please choose another date.</p>`;
+        return;
+      }
+
+      const timeButtons = slots.map(t => {
+        const sel = state.time === t ? ' selected' : '';
+        return `<button class="time-btn${sel}" onclick="selectTime('${t}')">${formatTime(t)}</button>`;
+      }).join('');
+
+      timesSection.innerHTML = `
+        <div class="times-heading">Available times</div>
+        <div class="times-grid">${timeButtons}</div>`;
+    }
+
+    function selectDay(iso) {
+      if (state.date === iso) return;
+      state.date = iso;
+      state.time = null;
+      renderWeekStrip();
+      renderTimeSlots();
+      updateSummaryBar();
+      renderFooter();
+    }
+
+    function selectTime(t) {
+      state.time = t;
+      setTimeout(() => goTo('email'), 150);
+    }
+
+    function prevWeek() {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const prev = new Date(weekStart);
+      prev.setDate(prev.getDate() - 4);
+      weekStart = prev < today ? new Date(today) : prev;
+      renderWeekStrip();
+    }
+
+    function nextStrip() {
+      const next = new Date(weekStart);
+      next.setDate(next.getDate() + 4);
+      weekStart = next;
+      renderWeekStrip();
+    }
+
+    // ── Details screen ─────────────────────────────────────
+    function initDetailsScreen() {
+      // Detect known user by email match
+      const isKnown = state.email === MOCK_USER.email;
+      const u = isKnown ? MOCK_USER : { firstName: '', lastName: '', phone: '', street: '', city: '', postalCode: '', pets: [] };
+
+      document.getElementById('dFirstName').value  = u.firstName;
+      document.getElementById('dLastName').value   = u.lastName;
+      document.getElementById('dEmail').value      = state.email; // always pre-fill from OTP step
+      document.getElementById('dPhone').value      = u.phone;
+      document.getElementById('dStreet').value     = u.street;
+      document.getElementById('dCity').value       = u.city;
+      document.getElementById('dPostal').value     = u.postalCode;
+
+      if (isKnown && u.phoneCountry) {
+        const sel = document.getElementById('dPhoneCountry');
+        [...sel.options].forEach(o => { if (o.text === u.phoneCountry) o.selected = true; });
+      }
+
+      // Reset checkboxes
+      ['termsRow', 'createAccountRow'].forEach(id => {
+        document.getElementById(id).classList.remove('checked');
+        document.getElementById(id.replace('Row', 'Check')).checked = false;
+      });
+
+      // Populate pet species grid — pre-select species from step 1
+      if (!state.petSpeciesId) {
+        state.petSpeciesId   = state.speciesId;
+        state.petSpeciesName = state.speciesName;
+      }
+      const PET_SPECIES_SVGS = {
+        dog: `<path d="m12.0001 12.9901c0 .55-.45 1-1 1v1c0 .55-.45 1-1 1-.55003 0-1.00003-.45-1.00003-1v-1c-.55 0-1-.45-1-1s.45-1 1-1h2.00003c.55 0 1 .45 1 1zm-5.00003-5.49997c-.55 0-1 .67-1 1.5s.45 1.49997 1 1.49997 1-.66997 1-1.49997-.45-1.5-1-1.5zm6.00003 0c-.55 0-1 .67-1 1.5s.45 1.49997 1 1.49997 1-.66997 1-1.49997-.45-1.5-1-1.5zm6.98 4.49997c.04.89-.36 1.79-1.06 2.38l-5.71 4.89c-.54.47-1.24.72-1.95.72h-2.52003c-.72 0-1.41-.25-1.94-.71l-5.72-4.9c-.699995-.6-1.0999954-1.49-1.0599955-2.38.2000005-4.53997 1.6699955-9.01997 3.7599955-11.419967.3-.34.74-.5399995 1.2-.5499995.44.02.91.1899995 1.23.5299995.87.959997 1.61 2.129997 2.21 3.489997 1.16-.08 2.00003-.08 3.15003 0 .6-1.37 1.34-2.54 2.21-3.489997.31-.34.77-.5399995 1.23-.5299995.46 0 .9.2099995 1.2.5499995 2.09 2.399997 3.56 6.879997 3.76 11.419967zm-2 .09c-.17-3.83997-1.35-7.70997-2.99-9.84997-.72.87-1.35 1.98-1.83 3.23-.16.41-.58.67-1.02.64-1.7-.14-2.59003-.14-4.28003 0-.43.04-.86-.22-1.02-.64-.48-1.25-1.11-2.36-1.83-3.23-1.64 2.14-2.83 6.02-2.99 9.84997-.01.29.12.58.36.78l5.72 4.9c.18.15.4.23.64.23h2.52003c.24 0 .47-.09.65-.24l5.71-4.89c.24-.2.37-.49.36-.78z" fill="currentColor"/>`,
+        cat: `<path d="m8.2 10.0074c0 .8302-.54 1.5005-1.2 1.5005s-1.2-.6703-1.2-1.5005c0-.8303.54-1.50052 1.2-1.50052s1.2.67022 1.2 1.50052zm4.8-1.50052c-.66 0-1.2.67022-1.2 1.50052 0 .8302.54 1.5005 1.2 1.5005s1.2-.6703 1.2-1.5005c0-.8303-.54-1.50052-1.2-1.50052zm7 5.50182h-2.59l2 2.0006-1.41 1.4105-2.07-2.0707c-1.47 1.6206-3.58 2.6509-5.93 2.6509s-4.47-1.0303-5.93-2.6509l-2.07 2.0707-1.41-1.4105 2-2.0006h-2.59v-2.0007h2.26c-.17-.6402-.26-1.3104-.26-2.0006v-9.00299c0-.400133.24-.770255.62-.9203041.37-.1600527.8-.070023 1.09.2200721l2.61 2.610862c2.27-1.19039 5.09-1.19039 7.36 0l2.61-2.620865c.29-.29009545.71-.3701218 1.09-.2200724.37.1500494.62.5201714.62.9203024v9.012995c0 .6902-.1 1.3604-.26 2.0006h2.26zm-5.48-.07-.23-.2301c-.29-.2901-.37-.7202-.22-1.0904.15-.3701.52-.6202.92-.6202h.65c.22-.6302.35-1.3004.35-2.00063v-6.58217l-1.45 1.45048c-.34.34011-.86.39013-1.26.13004-1.97-1.30043-4.62-1.30043-6.58 0-.4.26009-.92.21007-1.26-.13004l-1.45-1.45048v6.5922c0 .7002.13 1.3704.35 2.0006h.65c.4 0 .77.2401.92.6202.15.3702.07.8003-.22 1.0904l-.23.2301c1.1 1.2604 2.72 2.0706 4.52 2.0706s3.42-.8002 4.52-2.0706zm-3.81-2.6409c-.39-.3901-1.02-.3901-1.41 0l-1 1.0003c-.39.3902-.39 1.0204 0 1.4105s1.02.3901 1.41 0l.29-.2901.29.2901c.2.2001.45.2901.71.2901s.51-.1.71-.2901c.39-.3901.39-1.0203 0-1.4105z" fill="currentColor"/>`,
+        rabbit: `<path d="m15.63 7.02752c.08-.19.16-.37.24-.57.93-2.62.89-5.64-.98-6.33-.37-.14-.96-.23-1.69.11-1.19.55-2.37 2.13-3.07 4.11-.04.13-.09.25-.13.39-.04-.13-.09-.26-.13-.39-.7-1.98-1.88-3.56-3.07-4.11-.73-.34-1.32-.25-1.69-.11-1.87.7-1.91 3.71-.98 6.33.07.2.16.38.24.57-2.01 1.23-3.37 3.43998-3.37 5.96998 0 3.86 3.14 7 7 7h4c3.86 0 7-3.14 7-7 0-2.53-1.35-4.73998-3.37-5.96998zm-3.63 10.96998h-4c-2.76 0-5-2.24-5-5 0-1.77.93-3.31998 2.32-4.20998.16.23.33.45.51.66l1.68-1.12c-.58-.58-1.12-1.49-1.49-2.54-.74-2.09-.47-3.61-.22-3.79.29.02 1.43.87 2.19 3.02.49 1.4.89 3.42 1 3.98h2.03c.11-.57.5-2.59 1-3.98.76-2.14 1.89-3.03 2.16-3.02.28.19.54 1.71-.2 3.8-.37 1.05-.91 1.96-1.49 2.54l1.68 1.12c.17-.2.34-.42.51-.66 1.39.89 2.32 2.43998 2.32 4.20998 0 2.76-2.24 5-5 5zm-.29-3.71c.39.39.39 1.02 0 1.41-.2.2-.45.29-.71.29s-.51-.1-.71-.29l-.29-.29-.29.29c-.39.39-1.02.39-1.41 0s-.39-1.02 0-1.41l1-1c.39-.39 1.02-.39 1.41 0zm-3.51-1.29c0 .83-.54 1.5-1.2 1.5s-1.2-.67-1.2-1.5.54-1.5 1.2-1.5 1.2.67 1.2 1.5zm6 0c0 .83-.54 1.5-1.2 1.5s-1.2-.67-1.2-1.5.54-1.5 1.2-1.5 1.2.67 1.2 1.5z" fill="currentColor"/>`,
+      };
+      const petGrid = document.getElementById('petSpeciesGrid');
+      petGrid.innerHTML = '';
+      const MAIN_PET_SPECIES = ['dog', 'cat', 'rabbit'];
+      ALL_SPECIES.filter(s => MAIN_PET_SPECIES.includes(s.id)).forEach(sp => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'species-btn' + (sp.id === state.petSpeciesId ? ' selected' : '');
+        const svgPaths = PET_SPECIES_SVGS[sp.id] || '';
+        btn.innerHTML = `<svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">${svgPaths}</svg>${sp.name}`;
+        btn.onclick = () => selectPetSpecies(sp.id, sp.name, btn);
+        petGrid.appendChild(btn);
+      });
+      const petMoreBtn = document.createElement('button');
+      petMoreBtn.type = 'button';
+      petMoreBtn.className = 'show-more-btn';
+      petMoreBtn.id = 'petMoreSpeciesBtn';
+      petMoreBtn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>More`;
+      petMoreBtn.onclick = showMorePetSpecies;
+      petGrid.appendChild(petMoreBtn);
+      // If current selection is an "other" species, expand immediately
+      if (state.petSpeciesId && !MAIN_PET_SPECIES.includes(state.petSpeciesId)) {
+        showMorePetSpecies();
+      }
+
+      renderFooter();
+    }
+
+    function toggleCheckbox(rowId, checkId, callback) {
+      const row   = document.getElementById(rowId);
+      const input = document.getElementById(checkId);
+      const next  = !input.checked;
+      input.checked = next;
+      row.classList.toggle('checked', next);
+      if (callback) callback();
+    }
+
+    function selectPetSpecies(id, name, btn) {
+      document.querySelectorAll('#petSpeciesGrid .species-btn').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      state.petSpeciesId   = id;
+      state.petSpeciesName = name;
+      onDetailsInput();
+    }
+
+    function showMorePetSpecies() {
+      const grid    = document.getElementById('petSpeciesGrid');
+      const moreBtn = document.getElementById('petMoreSpeciesBtn');
+      if (!moreBtn) return;
+      ALL_SPECIES.slice(3).forEach(sp => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'species-btn text-only' + (sp.id === state.petSpeciesId ? ' selected' : '');
+        btn.textContent = sp.name;
+        btn.onclick = () => selectPetSpecies(sp.id, sp.name, btn);
+        grid.insertBefore(btn, moreBtn);
+      });
+      moreBtn.style.display = 'none';
+    }
+
+    function onDetailsInput() { renderFooter(); }
+
+    function detailsValid() {
+      const required = ['dFirstName', 'dLastName', 'dEmail', 'dPhone', 'dStreet', 'dCity', 'dPostal'];
+      const allFilled = required.every(id => document.getElementById(id)?.value.trim() !== '');
+      const petNameOk = document.getElementById('petName')?.value.trim() !== '';
+      const termsChecked = document.getElementById('termsCheck')?.checked;
+      return allFilled && petNameOk && termsChecked;
+    }
+
+    function submitDetails() {
+      if (!detailsValid()) return;
+      state.petName = document.getElementById('petName')?.value.trim() || '';
+      const btn = document.querySelector('#footerActions .cta-btn');
+      btn.innerHTML = '<span class="spinner"></span>Booking…';
+      btn.disabled = true;
+      setTimeout(() => goTo('confirm'), 1000);
+    }
+
+    // ── Success ─────────────────────────────────────────────
+    function renderSuccess() {
+      document.getElementById('successEmail').textContent = state.email;
+      document.getElementById('successTreatment').textContent = state.treatmentName;
+      document.getElementById('successTime').textContent = state.time;
+      document.getElementById('successPet').textContent = state.petName || '—';
+      const d = new Date(state.date + 'T00:00:00');
+      document.getElementById('successDate').textContent = d.toLocaleDateString('en-GB', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
+      });
+    }
+
+    // ── Footer ─────────────────────────────────────────────
+    function renderFooter() {
+      const el = document.getElementById('footerActions');
+
+      if (state.screen === 'start') { el.innerHTML = ''; return; }
+
+      if (state.screen === 'species') {
+        el.innerHTML = `<button class="cta-btn" disabled>Select a species to continue</button>`;
+        return;
+      }
+
+      if (state.screen === 'treatment') {
+        el.innerHTML = `<button class="cta-btn" disabled>Select a reason to continue</button>`;
+        return;
+      }
+
+      if (state.screen === 'date') {
+        if (state.date && state.time) {
+          el.innerHTML = `<button class="cta-btn" onclick="goTo('email')">Continue</button>`;
+        } else if (state.date && !state.time) {
+          el.innerHTML = `<button class="cta-btn" disabled>Select a time to continue</button>`;
+        } else {
+          el.innerHTML = `<button class="cta-btn" disabled>Select a date to continue</button>`;
+        }
+        return;
+      }
+
+      if (state.screen === 'email') {
+        const valid = isValidEmail((document.getElementById('emailInput') || {}).value || '');
+        el.innerHTML = valid
+          ? `<button class="cta-btn" onclick="trySendOtp()">Send verification code</button>`
+          : `<button class="cta-btn" disabled>Send verification code</button>`;
+        return;
+      }
+
+      if (state.screen === 'otp') {
+        const code = getOtpValue();
+        el.innerHTML = code.length === 6
+          ? `<button class="cta-btn" onclick="tryVerifyOtp()">Verify code</button>`
+          : `<button class="cta-btn" disabled>Enter 6-digit code</button>`;
+        return;
+      }
+
+      if (state.screen === 'details') {
+        const ok = detailsValid ? detailsValid() : false;
+        el.innerHTML = ok
+          ? `<button class="cta-btn" onclick="submitDetails()">Book appointment</button>`
+          : `<button class="cta-btn" disabled>Book appointment</button>`;
+        return;
+      }
+
+      if (state.screen === 'confirm') {
+        el.innerHTML = `
+          <div class="footer-btn-group">
+            <button class="cta-btn" onclick="window.open('https://my.provet.com/login','_blank')">My bookings</button>
+            <button class="cta-btn-outline" onclick="goTo('start')">Book another appointment</button>
+          </div>`;
+        return;
+      }
+
+      if (state.screen === 'manage') {
+        el.innerHTML = `<button class="cta-btn" onclick="doManageRedirect()">Sign in to patient portal</button>`;
+        return;
+      }
+    }
+
+    // ── Email screen ───────────────────────────────────────
+    function isValidEmail(v) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+    }
+
+    function initEmailScreen() {
+      document.getElementById('emailError').textContent = '';
+      // Restore previously entered email if navigating back
+      if (state.email) {
+        document.getElementById('emailInput').value = state.email;
+      }
+      setTimeout(() => document.getElementById('emailInput').focus(), 100);
+    }
+
+    function onEmailInput() {
+      document.getElementById('emailError').textContent = '';
+      renderFooter();
+    }
+
+    function trySendOtp() {
+      const val = document.getElementById('emailInput').value.trim();
+      if (!isValidEmail(val)) {
+        document.getElementById('emailError').textContent = 'Please enter a valid email address.';
+        document.getElementById('emailInput').classList.add('error');
+        return;
+      }
+      document.getElementById('emailInput').classList.remove('error');
+      state.email = val;
+
+      const btn = document.querySelector('#footerActions .cta-btn');
+      btn.innerHTML = '<span class="spinner"></span>Sending…';
+      btn.disabled = true;
+
+      // Simulate API call
+      setTimeout(() => goTo('otp'), 900);
+    }
+
+    // ── OTP screen ─────────────────────────────────────────
+    function initOtpScreen() {
+      document.getElementById('sentEmail').textContent = state.email;
+      document.getElementById('otpError').textContent = '';
+      const boxes = document.querySelectorAll('.otp-box');
+      boxes.forEach((box, i) => {
+        box.value = '';
+        box.classList.remove('filled');
+        box.oninput = (e) => {
+          const v = e.target.value.replace(/\D/g, '');
+          box.value = v ? v[v.length - 1] : '';
+          box.classList.toggle('filled', box.value !== '');
+          document.getElementById('otpError').textContent = '';
+          if (box.value && i < 5) boxes[i + 1].focus();
+          renderFooter();
+        };
+        box.onkeydown = (e) => {
+          if (e.key === 'Backspace' && !box.value && i > 0) boxes[i - 1].focus();
+          if (e.key === 'Enter' && getOtpValue().length === 6) tryVerifyOtp();
+        };
+        box.onpaste = (e) => {
+          e.preventDefault();
+          const pasted = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+          [...pasted.slice(0, 6)].forEach((ch, j) => {
+            if (boxes[j]) { boxes[j].value = ch; boxes[j].classList.add('filled'); }
+          });
+          const next = Math.min(pasted.length, 5);
+          boxes[next].focus();
+          renderFooter();
+        };
+      });
+      setTimeout(() => boxes[0].focus(), 100);
+    }
+
+    function getOtpValue() {
+      return [...document.querySelectorAll('.otp-box')].map(b => b.value).join('');
+    }
+
+    function tryVerifyOtp() {
+      const code = getOtpValue();
+      if (code.length !== 6) return;
+
+      const btn = document.querySelector('#footerActions .cta-btn');
+      btn.innerHTML = '<span class="spinner"></span>Verifying…';
+      btn.disabled = true;
+
+      // Simulate verification — any 6-digit code passes in mockup
+      setTimeout(() => {
+        state.otpVerified = true;
+        goTo('details');
+      }, 800);
+    }
+
+    function resendOtp() {
+      const boxes = document.querySelectorAll('.otp-box');
+      boxes.forEach(b => { b.value = ''; b.classList.remove('filled'); });
+      document.getElementById('otpError').textContent = '';
+      renderFooter();
+      const notice = document.getElementById('sentNotice');
+      notice.style.background = '#eff4ff';
+      notice.style.borderColor = '#bfcfff';
+      notice.querySelector('svg').style.stroke = '#1e40af';
+      notice.querySelector('span').textContent = `Code resent to `;
+      const strong = document.createElement('strong');
+      strong.textContent = state.email;
+      notice.querySelector('span').appendChild(strong);
+      setTimeout(() => {
+        notice.style.background = '';
+        notice.style.borderColor = '';
+      }, 2000);
+      setTimeout(() => boxes[0].focus(), 100);
+    }
+
+    // ── Redirects ──────────────────────────────────────────
+    function doBookingRedirect() {
+      // No longer used — booking is completed in-widget via submitDetails()
+    }
+
+    function doManageRedirect() {
+      const btn = document.querySelector('#footerActions .cta-btn');
+      btn.innerHTML = '<span class="spinner"></span>Redirecting…';
+      btn.disabled = true;
+      setTimeout(() => {
+        window.open('https://my.provet.com/login', '_blank');
+        btn.innerHTML = 'Sign in to patient portal';
+        btn.disabled = false;
+      }, 800);
+    }
+
+    // ── Init ───────────────────────────────────────────────
+    renderFooter();
+  </script>
+
+</body>
+</html>
