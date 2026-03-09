@@ -3,156 +3,790 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Embed test — Ambivet Heanor</title>
+  <meta name="theme-color" content="#ffffff" />
+  <title>Best Vets Company — Veterinary Care</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --brand:        #1e40af;
+      --brand-dark:   #1d3a9e;
+      --brand-light:  #eff4ff;
+      --accent:       #16a34a;
+      --text:         #0f172a;
+      --text-mid:     #334155;
+      --text-soft:    #64748b;
+      --border:       #e2e8f0;
+      --surface:      #f8fafc;
+      --white:        #ffffff;
+    }
 
     body {
-      font-family: system-ui, sans-serif;
-      background: #f1f5f9;
-      min-height: 200vh; /* tall page to test scroll */
-      padding: 48px 16px;
-    }
-
-    .page-header {
-      max-width: 960px;
-      margin: 0 auto 32px;
-    }
-
-    .page-header h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #0f172a;
-    }
-
-    .page-header p {
-      font-size: 14px;
-      color: #64748b;
-      margin-top: 4px;
-    }
-
-    .layout {
-      max-width: 960px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 400px;
-      gap: 32px;
-      align-items: start;
-    }
-
-    @media (max-width: 720px) {
-      .layout { grid-template-columns: 1fr; }
-    }
-
-    /* Fake clinic content */
-    .clinic-info h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #0f172a;
-      margin-bottom: 12px;
-    }
-
-    .clinic-info p {
-      font-size: 14px;
-      color: #334155;
-      line-height: 1.7;
-      margin-bottom: 16px;
-    }
-
-    .info-card {
-      background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 10px;
-      padding: 16px 20px;
-      margin-bottom: 16px;
-      font-size: 13px;
-      color: #334155;
+      font-family: system-ui, -apple-system, sans-serif;
+      color: var(--text);
+      background: var(--white);
       line-height: 1.6;
     }
 
-    .info-card strong { color: #0f172a; display: block; margin-bottom: 4px; }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
 
-    /* Widget container — this is all the clinic needs to add */
-    .provet-booking {
-      width: 100%;
-      height: 600px;
-      border-radius: 14px;
-      overflow: hidden;
-      box-shadow: 0 4px 24px rgba(15,23,42,0.10), 0 1px 4px rgba(15,23,42,0.06);
-      border: 1px solid #e2e8f0;
-      position: sticky;
-      top: 24px;
+    /* ── Top bar ── */
+    .topbar {
+      background: var(--brand);
+      color: rgba(255,255,255,0.9);
+      font-size: 13px;
+      padding: 8px 0;
+    }
+    .topbar-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .topbar a { color: inherit; }
+    .topbar-left { display: flex; gap: 20px; align-items: center; flex-wrap: wrap; }
+    .topbar-item { display: flex; align-items: center; gap: 6px; }
+    .topbar-item svg { width: 13px; height: 13px; opacity: 0.8; flex-shrink: 0; }
+    .emergency-tag {
+      background: #dc2626;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 100px;
+      letter-spacing: 0.04em;
     }
 
-    @media (max-width: 720px) {
-      .provet-booking {
-        position: static;
-        height: 560px;
-        border-radius: 0;
-        border-left: none;
-        border-right: none;
-        margin: 0 -16px;
-        width: calc(100% + 32px);
-        box-shadow: none;
-      }
+    /* ── Main nav ── */
+    .navbar {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 4px rgba(15,23,42,0.06);
+    }
+    .navbar-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      height: 64px;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--brand);
+      flex-shrink: 0;
+      letter-spacing: -0.02em;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--brand);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-icon svg { width: 20px; height: 20px; fill: #fff; }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+      list-style: none;
+    }
+    .nav-links a {
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-mid);
+      transition: background 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+    .nav-links a:hover { background: var(--surface); color: var(--text); }
+    .nav-links a.active { color: var(--brand); font-weight: 600; }
+    .nav-cta {
+      flex-shrink: 0;
+      padding: 9px 18px;
+      background: var(--brand);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      transition: background 0.15s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { background: var(--brand-dark); }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 50%, #2563eb 100%);
+      color: #fff;
+      padding: 80px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      position: relative;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255,255,255,0.15);
+      border: 1px solid rgba(255,255,255,0.25);
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-badge-dot {
+      width: 6px;
+      height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-size: clamp(28px, 4vw, 44px);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+    }
+    .hero p {
+      font-size: 16px;
+      opacity: 0.85;
+      line-height: 1.7;
+      margin-bottom: 32px;
+      max-width: 440px;
+    }
+    .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+    .btn-hero-primary {
+      padding: 13px 24px;
+      background: #fff;
+      color: var(--brand);
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .btn-hero-primary:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.2); transform: translateY(-1px); }
+    .btn-hero-secondary {
+      padding: 13px 24px;
+      border: 2px solid rgba(255,255,255,0.4);
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .btn-hero-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.6); }
+
+    /* Hero illustration */
+    .hero-visual {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .hero-card {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 28px;
+      width: 100%;
+      max-width: 340px;
+    }
+    .hero-card-title {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.7;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 16px;
+    }
+    .hero-stat-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .hero-stat {
+      background: rgba(255,255,255,0.15);
+      border-radius: 12px;
+      padding: 16px;
+      flex: 1;
+      text-align: center;
+    }
+    .hero-stat-num { font-size: 22px; font-weight: 800; line-height: 1; margin-bottom: 4px; }
+    .hero-stat-lbl { font-size: 11px; opacity: 0.7; }
+    .hero-avail {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+    }
+    .hero-avail-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Services ── */
+    .section { padding: 72px 24px; }
+    .section-inner { max-width: 1140px; margin: 0 auto; }
+    .section-label {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--brand);
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: clamp(22px, 3vw, 32px);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .section-desc {
+      font-size: 15px;
+      color: var(--text-soft);
+      max-width: 560px;
+      line-height: 1.7;
+      margin-bottom: 40px;
+    }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+    .service-card {
+      border: 1.5px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      background: var(--white);
+    }
+    .service-card:hover { border-color: #bfcfff; box-shadow: 0 4px 20px rgba(30,64,175,0.08); }
+    .service-icon {
+      width: 44px;
+      height: 44px;
+      background: var(--brand-light);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+    .service-icon svg { width: 22px; height: 22px; fill: var(--brand); }
+    .service-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+    .service-desc { font-size: 13px; color: var(--text-soft); line-height: 1.6; }
+
+    /* ── Info band ── */
+    .info-band { background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .info-band-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 40px 24px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .info-item { display: flex; align-items: flex-start; gap: 14px; }
+    .info-item-icon {
+      width: 42px;
+      height: 42px;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .info-item-icon svg { width: 18px; height: 18px; fill: var(--brand); }
+    .info-item-title { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .info-item-desc { font-size: 13px; color: var(--text-soft); line-height: 1.5; }
+
+    /* ── About + hours ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 48px;
+      align-items: start;
+    }
+    .about-img {
+      background: linear-gradient(135deg, #dbeafe, #bfcfff);
+      border-radius: 16px;
+      height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .about-img svg { width: 80px; height: 80px; fill: var(--brand); opacity: 0.3; }
+    .about-body h3 { font-size: 20px; font-weight: 800; margin-bottom: 12px; }
+    .about-body p { font-size: 14px; color: var(--text-mid); line-height: 1.75; margin-bottom: 12px; }
+
+    .hours-card {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+    .hours-card-head {
+      background: var(--brand);
+      color: #fff;
+      padding: 16px 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    .hours-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 11px 20px;
+      font-size: 13px;
+      border-bottom: 1px solid var(--border);
+    }
+    .hours-row:last-child { border-bottom: none; }
+    .hours-day { color: var(--text-mid); font-weight: 500; }
+    .hours-time { color: var(--text); font-weight: 600; }
+    .hours-closed { color: var(--text-soft); }
+    .hours-footer {
+      background: #fef2f2;
+      border-top: 1px solid #fecaca;
+      padding: 12px 20px;
+      font-size: 12px;
+      color: #dc2626;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .hours-footer svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    /* ── Team ── */
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .team-card {
+      text-align: center;
+      padding: 24px 16px;
+      border-radius: 14px;
+      border: 1.5px solid var(--border);
+      background: var(--white);
+    }
+    .team-avatar {
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: var(--brand-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+    }
+    .team-avatar svg { width: 32px; height: 32px; fill: var(--brand); }
+    .team-name { font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+    .team-role { font-size: 12px; color: var(--text-soft); }
+
+    /* ── CTA banner ── */
+    .cta-banner {
+      background: linear-gradient(135deg, var(--brand) 0%, #2563eb 100%);
+      color: #fff;
+      text-align: center;
+      padding: 64px 24px;
+    }
+    .cta-banner h2 { font-size: clamp(22px, 3vw, 32px); font-weight: 800; margin-bottom: 12px; letter-spacing: -0.02em; }
+    .cta-banner p { font-size: 15px; opacity: 0.85; max-width: 480px; margin: 0 auto 28px; }
+    .cta-banner-btn {
+      display: inline-block;
+      padding: 13px 28px;
+      background: #fff;
+      color: var(--brand);
+      font-weight: 700;
+      font-size: 14px;
+      border-radius: 8px;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .cta-banner-btn:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.2); transform: translateY(-1px); }
+
+    /* ── Footer ── */
+    .footer {
+      background: #0f172a;
+      color: rgba(255,255,255,0.7);
+      padding: 56px 24px 32px;
+    }
+    .footer-inner {
+      max-width: 1140px;
+      margin: 0 auto;
+    }
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    .footer-brand { font-size: 17px; font-weight: 800; color: #fff; margin-bottom: 10px; }
+    .footer-tagline { font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+    .footer-col-title { font-size: 12px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; margin-bottom: 14px; }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .footer-links a { font-size: 13px; transition: color 0.15s; }
+    .footer-links a:hover { color: #fff; }
+    .footer-contact-item { display: flex; align-items: flex-start; gap: 8px; font-size: 13px; margin-bottom: 10px; }
+    .footer-contact-item svg { width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; opacity: 0.6; }
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 24px;
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero-visual { display: none; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .info-band-inner { grid-template-columns: 1fr; gap: 20px; }
+      .about-grid { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 600px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .team-grid { grid-template-columns: 1fr 1fr; }
+      .footer-grid { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      .topbar-left .topbar-item:not(:first-child) { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <div class="page-header">
-    <h1>Ambivet Heanor</h1>
-    <p>Veterinary clinic — embed test page</p>
-  </div>
-
-  <div class="layout">
-
-    <!-- Fake clinic content -->
-    <div class="clinic-info">
-      <h2>Welcome to Ambivet Heanor</h2>
-      <p>
-        We are a full-service veterinary practice providing high quality,
-        compassionate care for your pets. Our experienced team is here to
-        help with everything from routine checkups to complex procedures.
-      </p>
-      <p>
-        Book an appointment online using the widget on the right, or call
-        us directly during opening hours.
-      </p>
-
-      <div class="info-card">
-        <strong>Opening hours</strong>
-        Mon–Fri 8:00–18:00<br />
-        Sat 9:00–14:00<br />
-        Sun Closed
+  <!-- Top bar -->
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="topbar-left">
+        <span class="topbar-item">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+          01572 823 456
+        </span>
+        <span class="topbar-item">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+          hello@bestvets.co.uk
+        </span>
+        <span class="topbar-item">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          14 Meadow Lane, Edinburgh EH4 2DT
+        </span>
       </div>
-
-      <div class="info-card">
-        <strong>Address</strong>
-        12 Market Street<br />
-        Heanor, DE75 7EG
-      </div>
-
-      <div class="info-card">
-        <strong>Phone</strong>
-        01773 710 123
-      </div>
-
-      <p style="color:#94a3b8; font-size:13px; margin-top:24px;">
-        ↑ This page is intentionally tall to test that the widget does not
-        interfere with the page scroll.
-      </p>
+      <span class="emergency-tag">24h Emergency Line: 01572 999 000</span>
     </div>
-
-    <!-- Widget embed — this is what the clinic adds to their site -->
-    <div
-      class="provet-booking"
-      data-clinic-slug="demo/small-animal-clinic"
-      data-clinic-name="Ambivet Heanor"
-    ></div>
-
   </div>
 
-  <script src="https://widget-app-tau.vercel.app/embed.js"></script>
+  <!-- Main nav -->
+  <nav class="navbar">
+    <div class="navbar-inner">
+      <a href="#" class="logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 20 20"><path d="m10 8c-3.66 0-6 3.55-6 6 0 4 3.05 4 6 4s6 0 6-4c0-2.45-2.34-6-6-6zm0 8c-3.34 0-4-.16-4-2 0-1.41 1.52-4 4-4s4 2.59 4 4c0 1.84-.66 2-4 2zm-5-12c0-1.38.9-2.5 2-2.5s2 1.12 2 2.5-.9 2.5-2 2.5-2-1.12-2-2.5zm6 0c0-1.38.9-2.5 2-2.5s2 1.12 2 2.5-.9 2.5-2 2.5-2-1.12-2-2.5zm9 4c0 1.38-.9 2.5-2 2.5s-2-1.12-2-2.5.9-2.5 2-2.5 2 1.12 2 2.5zm-16 0c0 1.38-.9 2.5-2 2.5s-2-1.12-2-2.5.9-2.5 2-2.5 2 1.12 2 2.5z"/></svg>
+        </div>
+        Best Vets Company
+      </a>
+      <ul class="nav-links">
+        <li><a href="#" class="active">Home</a></li>
+        <li><a href="#">Services</a></li>
+        <li><a href="#">Our Team</a></li>
+        <li><a href="#">Pet Health</a></li>
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Accepting new patients
+        </div>
+        <h1>Compassionate Care<br />for Your Beloved Pets</h1>
+        <p>Edinburgh's most trusted veterinary practice. From routine check-ups to specialist procedures, we treat every pet like our own.</p>
+        <div class="hero-actions">
+          <a href="#" class="btn-hero-secondary">Our services →</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-card">
+          <div class="hero-card-title">Practice at a glance</div>
+          <div class="hero-stat-row">
+            <div class="hero-stat">
+              <div class="hero-stat-num">12+</div>
+              <div class="hero-stat-lbl">Years open</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num">8</div>
+              <div class="hero-stat-lbl">Vets on staff</div>
+            </div>
+            <div class="hero-stat">
+              <div class="hero-stat-num">4.9★</div>
+              <div class="hero-stat-lbl">Google rating</div>
+            </div>
+          </div>
+          <div class="hero-avail">
+            <span class="hero-avail-dot"></span>
+            Next available: <strong style="margin-left:4px">Today 14:40</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Info band -->
+  <div class="info-band">
+    <div class="info-band-inner">
+      <div class="info-item">
+        <div class="info-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+        </div>
+        <div>
+          <div class="info-item-title">Same-day appointments</div>
+          <div class="info-item-desc">Urgent slots available most days. Call ahead or book online.</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93-2.67-1.14-5-4.43-5-7.93V7.18L12 5z"/></svg>
+        </div>
+        <div>
+          <div class="info-item-title">RCVS accredited practice</div>
+          <div class="info-item-desc">Registered with the Royal College of Veterinary Surgeons.</div>
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-item-icon">
+          <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"/></svg>
+        </div>
+        <div>
+          <div class="info-item-title">Online booking</div>
+          <div class="info-item-desc">Book an appointment 24/7 via the button in the corner.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Services -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-label">What we offer</div>
+      <h2 class="section-title">Comprehensive Veterinary Services</h2>
+      <p class="section-desc">From preventive care to complex surgery, our experienced team provides a full range of services for dogs, cats, rabbits, and exotic pets.</p>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg></div>
+          <div class="service-title">Wellness & Check-ups</div>
+          <div class="service-desc">Annual health exams, vaccinations, flea & worm prevention, and tailored health plans for every life stage.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z"/></svg></div>
+          <div class="service-title">Soft Tissue Surgery</div>
+          <div class="service-desc">Neutering, lump removals, wound repairs and a wide range of routine and complex surgical procedures.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M11 2v2.07A8.002 8.002 0 0 0 4.07 11H2v2h2.07A8.002 8.002 0 0 0 11 19.93V22h2v-2.07A8.002 8.002 0 0 0 19.93 13H22v-2h-2.07A8.002 8.002 0 0 0 13 4.07V2h-2zm1 4a6 6 0 1 1 0 12A6 6 0 0 1 12 6zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8z"/></svg></div>
+          <div class="service-title">Diagnostics & Imaging</div>
+          <div class="service-desc">In-house digital X-ray, ultrasound, blood analysis, and urine testing for rapid, accurate diagnosis.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M13 2.05V4.07C16.95 4.56 20 7.92 20 12s-3.05 7.44-7 7.93v2.02c5.01-.5 9-4.76 9-9.95 0-5.19-3.99-9.45-9-9.95zm-2 0C5.99 2.55 2 6.81 2 12c0 5.19 3.99 9.45 9 9.95v-2.02C7.05 19.44 4 16.08 4 12s3.05-7.44 7-7.93V2.05zM12 8l-4 4h3v4h2v-4h3l-4-4z"/></svg></div>
+          <div class="service-title">Emergency Care</div>
+          <div class="service-desc">24-hour emergency line with senior vets on call. Don't hesitate — call us immediately if you're worried.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+          <div class="service-title">Dental Care</div>
+          <div class="service-desc">Professional dental scaling, polishing, and extractions under full general anaesthesia with monitoring.</div>
+        </div>
+        <div class="service-card">
+          <div class="service-icon"><svg viewBox="0 0 24 24"><path d="M16.5 3c-1.74 0-3.41.81-4.5 2.09C10.91 3.81 9.24 3 7.5 3 4.42 3 2 5.42 2 8.5c0 3.78 3.4 6.86 8.55 11.54L12 21.35l1.45-1.32C18.6 15.36 22 12.28 22 8.5 22 5.42 19.58 3 16.5 3z"/></svg></div>
+          <div class="service-title">Preventive & Rehab</div>
+          <div class="service-desc">Microchipping, weight clinics, hydrotherapy referrals, and long-term chronic disease management.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About + Hours -->
+  <section class="section" style="background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div>
+          <div class="section-label">About us</div>
+          <h2 class="section-title">Edinburgh's Neighbourhood Vet Since 2012</h2>
+          <div class="about-img">
+            <svg viewBox="0 0 100 100"><path d="M50 20c-16.5 0-27 16-27 27 0 18 13.7 18 27 18s27 0 27-18c0-11-10.5-27-27-27zm0 36c-15 0-18-.7-18-9 0-6.4 6.8-18 18-18s18 11.6 18 18c0 8.3-3 9-18 9zM27.5 20c0-6.2 4-11.2 9-11.2s9 5 9 11.2-4 11.2-9 11.2-9-5-9-11.2zm13.5 0c0-6.2 4-11.2 9-11.2s9 5 9 11.2-4 11.2-9 11.2-9-5-9-11.2zm27 18c0 6.2-4 11.2-9 11.2s-9-5-9-11.2 4-11.2 9-11.2 9 5 9 11.2zm-54 0c0 6.2-4 11.2-9 11.2s-9-5-9-11.2 4-11.2 9-11.2 9 5 9 11.2z"/></svg>
+          </div>
+          <div class="about-body">
+            <h3>A team that genuinely cares</h3>
+            <p>Best Vets Company was founded with a single mission: to give every pet in Edinburgh access to outstanding veterinary care without the stress. We know that visiting the vet can be daunting — for pets and owners alike — and we work hard to make every visit as calm and positive as possible.</p>
+            <p>Our team of eight qualified vets and twelve nurses brings decades of combined experience in small animal medicine, surgery, and exotic species. We invest continuously in equipment, training, and facilities so your pet always receives evidence-based care.</p>
+          </div>
+        </div>
+        <div>
+          <div class="section-label" style="margin-bottom: 12px;">Opening hours</div>
+          <div class="hours-card">
+            <div class="hours-card-head">📅 Weekly schedule</div>
+            <div class="hours-row"><span class="hours-day">Monday</span><span class="hours-time">8:00 – 19:00</span></div>
+            <div class="hours-row"><span class="hours-day">Tuesday</span><span class="hours-time">8:00 – 19:00</span></div>
+            <div class="hours-row"><span class="hours-day">Wednesday</span><span class="hours-time">8:00 – 19:00</span></div>
+            <div class="hours-row"><span class="hours-day">Thursday</span><span class="hours-time">8:00 – 19:00</span></div>
+            <div class="hours-row"><span class="hours-day">Friday</span><span class="hours-time">8:00 – 18:00</span></div>
+            <div class="hours-row"><span class="hours-day">Saturday</span><span class="hours-time">9:00 – 14:00</span></div>
+            <div class="hours-row"><span class="hours-day">Sunday</span><span class="hours-closed">Closed</span></div>
+            <div class="hours-footer">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+              24h emergency line: 01572 999 000
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Team -->
+  <section class="section">
+    <div class="section-inner">
+      <div class="section-label">Our people</div>
+      <h2 class="section-title">Meet the Team</h2>
+      <p class="section-desc">Every member of our team is passionate about animal welfare and committed to providing the highest standard of care.</p>
+      <div class="team-grid">
+        <div class="team-card">
+          <div class="team-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/></svg></div>
+          <div class="team-name">Dr Sarah Mitchell</div>
+          <div class="team-role">Principal Vet & Founder</div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/></svg></div>
+          <div class="team-name">Dr James Okafor</div>
+          <div class="team-role">Small Animal Surgeon</div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/></svg></div>
+          <div class="team-name">Dr Priya Nair</div>
+          <div class="team-role">Feline & Exotic Specialist</div>
+        </div>
+        <div class="team-card">
+          <div class="team-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm0 2c-3.33 0-10 1.67-10 5v2h20v-2c0-3.33-6.67-5-10-5z"/></svg></div>
+          <div class="team-name">Callum Fraser RVN</div>
+          <div class="team-role">Head Veterinary Nurse</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA banner -->
+  <div class="cta-banner">
+    <h2>Ready to book your pet's next visit?</h2>
+    <p>Use the <strong>Online booking</strong> button in the corner to find the next available slot in seconds — no phone queues, no waiting.</p>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">Best Vets Company</div>
+          <div class="footer-tagline">Compassionate, evidence-based veterinary care for pets of all shapes and sizes in Edinburgh since 2012.</div>
+        </div>
+        <div>
+          <div class="footer-col-title">Services</div>
+          <ul class="footer-links">
+            <li><a href="#">Wellness & Vaccinations</a></li>
+            <li><a href="#">Surgery</a></li>
+            <li><a href="#">Diagnostics</a></li>
+            <li><a href="#">Dental Care</a></li>
+            <li><a href="#">Emergency</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Practice</div>
+          <ul class="footer-links">
+            <li><a href="#">About Us</a></li>
+            <li><a href="#">Our Team</a></li>
+            <li><a href="#">Pet Health Blog</a></li>
+            <li><a href="#">Careers</a></li>
+            <li><a href="#">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Contact</div>
+          <div class="footer-contact-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z"/></svg>
+            01572 823 456
+          </div>
+          <div class="footer-contact-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+            hello@bestvets.co.uk
+          </div>
+          <div class="footer-contact-item">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            14 Meadow Lane, Edinburgh EH4 2DT
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2025 Best Vets Company Ltd. All rights reserved.</span>
+        <span>Registered with the RCVS · Company No. SC412783</span>
+      </div>
+    </div>
+  </footer>
+
+
+  <!-- Widget embed -->
+  <script
+    src="https://widget-app-tau.vercel.app/embed.js"
+    data-clinic-slug="demo/best-vets-company"
+    data-clinic-name="Best Vets Company"
+    async
+  ></script>
+
 </body>
 </html>
