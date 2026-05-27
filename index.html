@@ -5,8 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#ffffff" />
   <title>Best Vets Company — Veterinary Care</title>
+  <script>
+    // Demo-versiot: ?v=lite piilottaa Health plans- ja Pay invoice -napit.
+    if (new URLSearchParams(location.search).get("v") === "lite") {
+      document.documentElement.classList.add("v-lite");
+    }
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* Lite-demo (?v=lite): piilota Health plans + Pay invoice */
+    .v-lite [data-widget-view="plans"],
+    .v-lite [data-widget-view="pay"] { display: none !important; }
 
     :root {
       --brand:        #1e40af;
@@ -1147,13 +1157,22 @@
   </script>
 
   <!-- Widget embed -->
-  <script
-    src="https://widget-app-tau.vercel.app/embed.js"
-    data-clinic-slug="demo/best-vets-company"
-    data-clinic-name="Best Vets Company"
-    data-primary-color="#1e40af"
-    async
-  ></script>
+  <script>
+    // Demo-versiot: ?v=lite näyttää vain book, manage ja pricing -toiminnot
+    // (piilottaa Health plans + Pay invoice) sekä greeterissä että widgetin sisällä.
+    (function () {
+      var lite = new URLSearchParams(location.search).get("v") === "lite";
+      var s = document.createElement("script");
+      s.src = "https://widget-app-tau.vercel.app/embed.js";
+      s.setAttribute("data-nh-embed", "");
+      s.setAttribute("data-clinic-slug", "demo/best-vets-company");
+      s.setAttribute("data-clinic-name", "Best Vets Company");
+      s.setAttribute("data-primary-color", "#1e40af");
+      if (lite) s.setAttribute("data-actions", "book,manage,pricing");
+      s.async = true;
+      document.body.appendChild(s);
+    })();
+  </script>
 
 </body>
 </html>
